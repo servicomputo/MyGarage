@@ -57,7 +57,7 @@ export function FormView({ kind }: { kind: Kind }) {
       <div className="px-4 py-3">
         {kind === "add-part" && <PartForm vehicleId={vehicleId} mileage={vehicle.mileage} onDone={() => setView("vehicle-detail", { id: vehicleId })} />}
         {kind === "add-expense" && <ExpenseForm vehicleId={vehicleId} onDone={() => setView("vehicle-detail", { id: vehicleId })} />}
-        {kind === "add-fuel" && <FuelForm vehicleId={vehicleId} mileage={vehicle.mileage} onDone={() => setView("vehicle-detail", { id: vehicleId })} />}
+        {kind === "add-fuel" && <FuelForm vehicleId={vehicleId} mileage={vehicle.mileage} onDone={() => setView("fuel", { id: vehicleId })} />}
         {kind === "add-reminder" && <ReminderForm vehicleId={vehicleId} mileage={vehicle.mileage} onDone={() => setView("vehicle-detail", { id: vehicleId })} />}
         {kind === "add-document" && <DocumentForm vehicleId={vehicleId} onDone={() => setView("vehicle-detail", { id: vehicleId })} />}
       </div>

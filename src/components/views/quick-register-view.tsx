@@ -91,6 +91,13 @@ export function QuickRegisterView({ preset }: { preset?: string }) {
   }
 
   function pickType(type: string) {
+    // Si elige Combustible, ir al formulario de combustible (litros, precio/L, etc.)
+    // en lugar de crear un mantenimiento de tipo FUEL
+    if (type === "FUEL") {
+      selectVehicle(vehicleId!);
+      setView("add-fuel", { id: vehicleId! });
+      return;
+    }
     setSelectedType(type);
     setStep("details");
   }
@@ -157,8 +164,25 @@ export function QuickRegisterView({ preset }: { preset?: string }) {
           <>
             <div>
               <p className="text-sm text-muted-foreground mb-2">¿Qué quieres registrar?</p>
+
+              {/* Botón destacado: carga de combustible */}
+              <button
+                onClick={() => pickType("FUEL")}
+                className="w-full flex items-center gap-3 p-3 rounded-xl bg-fuchsia-50 dark:bg-fuchsia-950/30 border-2 border-fuchsia-200 dark:border-fuchsia-900 tap-feedback mb-3"
+              >
+                <span className="grid place-items-center h-11 w-11 rounded-xl bg-fuchsia-100 dark:bg-fuchsia-900/50 text-xl shrink-0">
+                  ⛽
+                </span>
+                <div className="flex-1 text-left">
+                  <p className="text-sm font-semibold text-fuchsia-700 dark:text-fuchsia-300">Cargar combustible</p>
+                  <p className="text-xs text-muted-foreground">Litros, precio/L, gasolinera y consumo km/L</p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-fuchsia-600" />
+              </button>
+
+              <p className="text-xs text-muted-foreground mb-1.5 mt-2">Mantenimientos y servicios</p>
               <div className="grid grid-cols-3 gap-2">
-                {MAINTENANCE_TYPES.map((t) => {
+                {MAINTENANCE_TYPES.filter((t) => t.value !== "FUEL").map((t) => {
                   const c = colorClasses(t.color);
                   return (
                     <button
