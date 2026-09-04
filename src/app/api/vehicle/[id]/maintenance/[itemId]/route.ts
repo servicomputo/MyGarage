@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
+import { parseDateInput } from "@/lib/format";
 
 const updateSchema = z.object({
   type: z.string().min(1).optional(),
@@ -43,7 +44,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const partsCost = d.partsCost ?? maintenance.partsCost;
     const laborCost = d.laborCost ?? maintenance.laborCost;
     const totalCost = partsCost + laborCost;
-    const date = d.date ? new Date(d.date) : undefined;
+    const date = d.date ? parseDateInput(d.date) : undefined;
 
     const updated = await db.maintenance.update({
       where: { id: itemId },

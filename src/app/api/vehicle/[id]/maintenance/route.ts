@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
+import { parseDateInput } from "@/lib/format";
 
 const maintenanceSchema = z.object({
   type: z.string().min(1),
@@ -57,7 +58,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const totalCost = d.totalCost !== undefined
       ? d.totalCost
       : (d.partsCost ?? 0) + (d.laborCost ?? 0);
-    const date = d.date ? new Date(d.date) : new Date();
+    const date = d.date ? parseDateInput(d.date) : new Date();
 
     const created = await db.$transaction(async (tx) => {
       // Actualizar kilometraje del vehículo si el del mantenimiento es mayor

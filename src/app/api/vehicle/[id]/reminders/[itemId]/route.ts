@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
-import { addDays } from "@/lib/format";
+import { addDays, parseDateInput } from "@/lib/format";
 
 const updateSchema = z.object({
   type: z.string().optional(),
@@ -62,10 +62,10 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const newIntervalDays = d.intervalDays !== undefined ? d.intervalDays : reminder.intervalDays;
     const newLastDoneDateRaw =
       d.lastDoneDate !== undefined ? d.lastDoneDate : reminder.lastDoneDate;
-    const newLastDoneDate = newLastDoneDateRaw ? new Date(newLastDoneDateRaw) : null;
+    const newLastDoneDate = newLastDoneDateRaw ? (typeof newLastDoneDateRaw === "string" ? parseDateInput(newLastDoneDateRaw) : newLastDoneDateRaw) : null;
 
     if (d.nextDueDate !== undefined) {
-      nextDueDate = d.nextDueDate ? new Date(d.nextDueDate) : null;
+      nextDueDate = d.nextDueDate ? parseDateInput(d.nextDueDate) : null;
     } else if (
       (d.intervalDays !== undefined || d.lastDoneDate !== undefined) &&
       newIntervalDays != null
@@ -78,7 +78,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     }
 
     const lastDoneDate = d.lastDoneDate !== undefined
-      ? (d.lastDoneDate ? new Date(d.lastDoneDate) : null)
+      ? (d.lastDoneDate ? parseDateInput(d.lastDoneDate) : null)
       : undefined;
 
     const updated = await db.reminder.update({

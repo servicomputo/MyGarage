@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
+import { parseDateInput } from "@/lib/format";
 
 const vehicleUpdateSchema = z.object({
   photo: z.string().nullable().optional(),
@@ -53,7 +54,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         color: d.color !== undefined ? d.color : undefined,
         plates: d.plates !== undefined ? d.plates : undefined,
         vin: d.vin !== undefined ? d.vin : undefined,
-        purchaseDate: d.purchaseDate !== undefined ? (d.purchaseDate ? new Date(d.purchaseDate) : null) : undefined,
+        purchaseDate: d.purchaseDate !== undefined ? (d.purchaseDate ? parseDateInput(d.purchaseDate) : null) : undefined,
         purchasePrice: d.purchasePrice !== undefined ? d.purchasePrice : undefined,
         notes: d.notes !== undefined ? d.notes : undefined,
       },

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
+import { parseDateInput } from "@/lib/format";
 
 const vehicleSchema = z.object({
   photo: z.string().nullable().optional(),
@@ -81,7 +82,7 @@ export async function POST(req: Request) {
         plates: d.plates ?? null,
         vin: d.vin ?? null,
         mileage: d.mileage,
-        purchaseDate: d.purchaseDate ? new Date(d.purchaseDate) : null,
+        purchaseDate: d.purchaseDate ? parseDateInput(d.purchaseDate) : null,
         purchasePrice: d.purchasePrice ?? null,
         notes: d.notes ?? null,
       },

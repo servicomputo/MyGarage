@@ -1,4 +1,26 @@
-// Helpers de formato y cálculo
+// Helpers de fecha que respetan la zona horaria del usuario.
+// Las fechas de "solo día" (sin hora) se manejan como mediodía UTC
+// para evitar que un cambio de zona horaria mueva la fecha al día anterior/siguiente.
+
+// Convierte un string "YYYY-MM-DD" (de un input date) a un Date a mediodía UTC.
+// Esto evita que la fecha cambie de día al convertir entre zonas horarias.
+export function parseDateInput(dateStr: string): Date {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  if (!y || !m || !d) return new Date();
+  // Mediodía UTC para evitar cambios de día por zona horaria
+  return new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+}
+
+// Devuelve la fecha de hoy en formato "YYYY-MM-DD" usando la zona horaria
+// LOCAL del navegador (no UTC). Esto evita que a partir de cierta hora
+// el día se adelante por la conversión a UTC.
+export function todayLocalISO(): string {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
 
 export function formatCurrency(amount: number | null | undefined): string {
   const value = amount ?? 0;
@@ -18,33 +40,40 @@ export function formatMileage(km: number | null | undefined): string {
   return `${formatNumber(km)} km`;
 }
 
+const MONTHS_LONG = [
+  "enero", "febrero", "marzo", "abril", "mayo", "junio",
+  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+];
+
+// Formatea una fecha mostrando solo el día/mes/año.
+// Usa UTC para que sea consistente con cómo se guardan las fechas (mediodía UTC).
 export function formatDate(date: Date | string | null | undefined): string {
   if (!date) return "—";
   const d = typeof date === "string" ? new Date(date) : date;
-  return new Intl.DateTimeFormat("es-MX", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(d);
+  // Extraer componentes en UTC para consistencia
+  const day = d.getUTCDate();
+  const month = d.getUTCMonth();
+  const year = d.getUTCFullYear();
+  return `${day} de ${MONTHS_LONG[month]} de ${year}`;
 }
 
 export function formatDateShort(date: Date | string | null | undefined): string {
   if (!date) return "—";
   const d = typeof date === "string" ? new Date(date) : date;
-  return new Intl.DateTimeFormat("es-MX", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  }).format(d);
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const year = d.getUTCFullYear();
+  return `${day}/${month}/${year}`;
 }
 
 export function formatRelativeTime(date: Date | string | null | undefined): string {
   if (!date) return "—";
   const d = typeof date === "string" ? new Date(date) : date;
   const now = new Date();
-  const diffMs = now.getTime() - d.getTime();
-  const isFuture = diffMs < 0;
-  const absDays = Math.floor(Math.abs(diffMs) / (1000 * 60 * 60 * 24));
+  // Comparar solo por día (ignorando hora) para "Hoy" / "Ayer"
+  const dayDiff = Math.floor((startOfUTCDate(now).getTime() - startOfUTCDate(d).getTime()) / (1000 * 60 * 60 * 24));
+  const isFuture = dayDiff < 0;
+  const absDays = Math.abs(dayDiff);
   if (absDays === 0) return "Hoy";
   if (!isFuture) {
     if (absDays === 1) return "Ayer";
@@ -59,6 +88,10 @@ export function formatRelativeTime(date: Date | string | null | undefined): stri
     if (absDays < 365) return `En ${Math.floor(absDays / 30)} meses`;
     return `En ${Math.floor(absDays / 365)} años`;
   }
+}
+
+function startOfUTCDate(d: Date): Date {
+  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
 }
 
 export function getGreeting(): string {
@@ -86,7 +119,6 @@ export function getReminderStatus(
   if (dueKm && dueDate) {
     const kmLeft = dueKm - currentMileage;
     const daysLeft = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    // lo que ocurra primero
     if (kmLeft <= 0 || daysLeft <= 0) {
       return { status: "overdue", label: "Vencido", subLabel: kmLeft <= 0 ? "Por kilometraje" : "Por fecha" };
     }
@@ -119,7 +151,6 @@ export const STATUS_COLOR: Record<ReminderStatus, { dot: string; text: string; b
   none: { dot: "bg-gray-400", text: "text-gray-600 dark:text-gray-400", bg: "bg-gray-50 dark:bg-gray-800/40", ring: "ring-gray-200 dark:ring-gray-700" },
 };
 
-// Calcular estado general del vehículo basado en recordatorios
 export function getVehicleStatus(
   reminders: { nextDueKm?: number | null; nextDueDate?: Date | string | null; enabled?: boolean }[],
   currentMileage: number
@@ -139,7 +170,6 @@ export function getVehicleStatus(
   return { status: "ok", label: "Todo en orden" };
 }
 
-// Calcula fecha siguiente dado un intervalo en días
 export function addDays(date: Date, days: number): Date {
   const d = new Date(date);
   d.setDate(d.getDate() + days);

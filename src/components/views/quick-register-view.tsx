@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PhotoUpload } from "@/components/photo-upload";
 import { MAINTENANCE_TYPES, colorClasses } from "@/lib/constants";
-import { formatMileage, formatCurrency } from "@/lib/format";
+import { formatMileage, formatCurrency, todayLocalISO } from "@/lib/format";
 import { ChevronDown, ChevronRight, Loader2, Check } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -38,7 +38,7 @@ export function QuickRegisterView({ preset }: { preset?: string }) {
     }
   }, [vehicle, mileageInitialized]);
 
-  const [date, setDate] = useState<string>(new Date().toISOString().split("T")[0]);
+  const [date, setDate] = useState<string>(todayLocalISO());
   const [description, setDescription] = useState("");
   const [totalCost, setTotalCost] = useState<string>("");
   const [showAdvanced, setShowAdvanced] = useState(false);

@@ -23,7 +23,7 @@ import {
 import { Loader2, Save, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { formatMileage } from "@/lib/format";
+import { formatMileage, todayLocalISO } from "@/lib/format";
 
 type Kind = "add-part" | "add-expense" | "add-fuel" | "add-reminder" | "add-document";
 
@@ -173,7 +173,7 @@ function ExpenseForm({ vehicleId, onDone }: { vehicleId: string; onDone: () => v
   const create = useCreateExpense(vehicleId);
   const [form, setForm] = useState({
     title: "", category: "MAINTENANCE", amount: "" as string | number,
-    date: new Date().toISOString().split("T")[0], notes: "",
+    date: todayLocalISO(), notes: "",
   });
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -224,7 +224,7 @@ function ExpenseForm({ vehicleId, onDone }: { vehicleId: string; onDone: () => v
 function FuelForm({ vehicleId, mileage, onDone }: { vehicleId: string; mileage: number; onDone: () => void }) {
   const create = useCreateFuel(vehicleId);
   const [form, setForm] = useState({
-    date: new Date().toISOString().split("T")[0],
+    date: todayLocalISO(),
     mileage: mileage,
     liters: "" as string | number,
     pricePerL: "" as string | number,
@@ -383,7 +383,7 @@ function DocumentForm({ vehicleId, onDone }: { vehicleId: string; onDone: () => 
     title: "",
     fileUrl: null as string | null,
     notes: "",
-    date: new Date().toISOString().split("T")[0],
+    date: todayLocalISO(),
   });
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => setForm((f) => ({ ...f, [k]: v }));
 

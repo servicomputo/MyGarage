@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
+import { parseDateInput } from "@/lib/format";
 
 const documentSchema = z.object({
   type: z.string().default("OTHER"),
@@ -42,7 +43,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       return NextResponse.json({ error: "Datos inválidos", details: parsed.error.flatten() }, { status: 400 });
     }
     const d = parsed.data;
-    const date = d.date ? new Date(d.date) : new Date();
+    const date = d.date ? parseDateInput(d.date) : new Date();
     const created = await db.document.create({
       data: {
         vehicleId: id,

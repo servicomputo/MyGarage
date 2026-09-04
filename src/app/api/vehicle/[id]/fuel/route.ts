@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
+import { parseDateInput } from "@/lib/format";
 
 const fuelSchema = z.object({
   date: z.string().nullable().optional(),
@@ -45,7 +46,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     }
     const d = parsed.data;
     const total = d.total ?? d.liters * d.pricePerL;
-    const date = d.date ? new Date(d.date) : new Date();
+    const date = d.date ? parseDateInput(d.date) : new Date();
 
     const created = await db.$transaction(async (tx) => {
       // Actualizar kilometraje del vehículo si el de la carga es mayor

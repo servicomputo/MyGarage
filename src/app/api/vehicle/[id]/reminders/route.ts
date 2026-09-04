@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
-import { addDays } from "@/lib/format";
+import { addDays, parseDateInput } from "@/lib/format";
 
 const reminderSchema = z.object({
   type: z.string().default("OTHER"),
@@ -71,16 +71,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     // Calcular nextDueDate
     let nextDueDate: Date | null = null;
     if (d.nextDueDate) {
-      nextDueDate = new Date(d.nextDueDate);
+      nextDueDate = parseDateInput(d.nextDueDate);
     } else if (d.intervalDays != null) {
       if (d.lastDoneDate) {
-        nextDueDate = addDays(new Date(d.lastDoneDate), d.intervalDays);
+        nextDueDate = addDays(parseDateInput(d.lastDoneDate), d.intervalDays);
       } else {
         nextDueDate = addDays(new Date(), d.intervalDays);
       }
     }
 
-    const lastDoneDate = d.lastDoneDate ? new Date(d.lastDoneDate) : null;
+    const lastDoneDate = d.lastDoneDate ? parseDateInput(d.lastDoneDate) : null;
 
     const created = await db.reminder.create({
       data: {

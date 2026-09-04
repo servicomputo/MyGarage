@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
+import { parseDateInput } from "@/lib/format";
 
 const partSchema = z.object({
   name: z.string().min(1, "Nombre requerido"),
@@ -56,7 +57,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       nextChangeKm = d.installMileage + d.estimatedLifeKm;
     }
 
-    const installDate = d.installDate ? new Date(d.installDate) : new Date();
+    const installDate = d.installDate ? parseDateInput(d.installDate) : new Date();
 
     const created = await db.$transaction(async (tx) => {
       // Actualizar kilometraje del vehículo si el de la refacción es mayor

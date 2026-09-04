@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
+import { parseDateInput } from "@/lib/format";
 
 const updateSchema = z.object({
   name: z.string().min(1).optional(),
@@ -40,7 +41,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     }
     const d = parsed.data;
 
-    const installDate = d.installDate ? new Date(d.installDate) : undefined;
+    const installDate = d.installDate ? parseDateInput(d.installDate) : undefined;
 
     // Recalcular nextChangeKm si se actualiza estimatedLifeKm o installMileage
     let nextChangeKm: number | null | undefined = undefined;
