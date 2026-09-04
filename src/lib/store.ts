@@ -22,7 +22,8 @@ export type ViewName =
   | "search"
   | "more"
   | "profile"
-  | "insights";
+  | "insights"
+  | "fuel";
 
 interface NavState {
   view: ViewName;

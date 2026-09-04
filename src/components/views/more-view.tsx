@@ -4,13 +4,14 @@ import { TopBar } from "@/components/top-bar";
 import { Card } from "@/components/ui/card";
 import { useNav } from "@/lib/store";
 import {
-  Bell, History, FileText, Sparkles, ChevronRight, Car, Info, Shield, User,
+  Bell, History, FileText, Sparkles, ChevronRight, Car, Info, Shield, Fuel,
 } from "lucide-react";
 
 export function MoreView() {
   const setView = useNav((s) => s.setView);
 
   const menu = [
+    { icon: Fuel, label: "Combustible", desc: "Consumo, km/L y gasto por vehículo", onClick: () => setView("fuel") },
     { icon: Bell, label: "Recordatorios", desc: "Mantenimientos próximos y vencidos", onClick: () => setView("reminders") },
     { icon: History, label: "Historial", desc: "Línea de tiempo de actividad", onClick: () => setView("history") },
     { icon: FileText, label: "Documentos", desc: "Facturas, pólizas y comprobantes", onClick: () => setView("documents") },

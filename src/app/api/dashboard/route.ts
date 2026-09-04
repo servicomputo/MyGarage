@@ -26,11 +26,8 @@ export async function GET() {
   const monthStart = startOfMonth(now);
   const yearStart = startOfYear(now);
 
-   
   const vehiclesData: any[] = [];
-   
   const allReminders: any[] = [];
-   
   const recentItems: { date: Date; vehicleId: string; vehicleName: string; kind: string; data: any }[] = [];
 
   let totalSpendThisMonth = 0;
@@ -45,7 +42,7 @@ export async function GET() {
       db.reminder.findMany({ where: { vehicleId: v.id, enabled: true } }),
       db.part.findMany({ where: { vehicleId: v.id }, orderBy: { installDate: "desc" } }),
       db.maintenance.findMany({ where: { vehicleId: v.id }, orderBy: { date: "desc" } }),
-      db.fueling.findMany({ where: { vehicleId: v.id }, orderBy: { date: "desc" } }),
+      db.fueling.findMany({ where: { vehicleId: v.id }, orderBy: { date: "asc" } }),
     ]);
 
     const vehicleTotalSpend = expenses.reduce((s, e) => s + e.amount, 0);
@@ -69,6 +66,23 @@ export async function GET() {
     const nextReminder = remindersWithStatus[0] ?? null;
     allReminders.push(...remindersWithStatus);
 
+    // Estadísticas de combustible
+    const fuelingCount = fuelings.length;
+    const totalLiters = fuelings.reduce((s, f) => s + f.liters, 0);
+    const totalFuelSpend = fuelings.reduce((s, f) => s + f.total, 0);
+    let avgConsumption: number | null = null;
+    if (fuelings.length >= 2) {
+      const firstKm = fuelings[0].mileage;
+      const lastKm = fuelings[fuelings.length - 1].mileage;
+      const distance = lastKm - firstKm;
+      if (distance > 0) {
+        const litersBetween = fuelings.slice(1).reduce((s, f) => s + f.liters, 0);
+        if (litersBetween > 0) {
+          avgConsumption = Math.round((distance / litersBetween) * 100) / 100;
+        }
+      }
+    }
+
     vehiclesData.push({
       ...v,
       vehicleName,
@@ -77,6 +91,12 @@ export async function GET() {
       nextReminder,
       partsCount: parts.length,
       maintenanceCount: maintenances.length,
+      fuelStats: {
+        fuelingCount,
+        totalLiters: Math.round(totalLiters * 100) / 100,
+        totalFuelSpend: Math.round(totalFuelSpend * 100) / 100,
+        avgConsumption,
+      },
     });
 
     // Recent activity
@@ -110,7 +130,7 @@ export async function GET() {
         data: { id: e.id, category: e.category, title: e.title, amount: e.amount, icon: opt.emoji },
       });
     }
-    for (const f of fuelings.slice(0, 5)) {
+    for (const f of fuelings.slice(-5).reverse()) {
       recentItems.push({
         date: f.date,
         vehicleId: v.id,

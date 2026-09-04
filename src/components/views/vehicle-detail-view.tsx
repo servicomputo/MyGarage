@@ -257,6 +257,39 @@ function SummaryTab({ vehicleId }: { vehicleId: string }) {
         </Card>
       )}
 
+      {/* Combustible */}
+      <Card className="overflow-hidden cursor-pointer tap-feedback" onClick={() => setView("fuel", { id: vehicleId })}>
+        <div className="p-4">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-semibold">Combustible</h3>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </div>
+          {stats.fuelStats && stats.fuelStats.avgConsumption !== null ? (
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div>
+                <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Consumo</p>
+                <p className="text-base font-bold text-primary">
+                  {stats.fuelStats.avgConsumption}
+                  <span className="text-[10px] font-normal text-muted-foreground ml-0.5">km/L</span>
+                </p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Costo/km</p>
+                <p className="text-base font-bold">
+                  {stats.fuelStats.costPerKm !== null ? `$${stats.fuelStats.costPerKm}` : "—"}
+                </p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Gastado</p>
+                <p className="text-base font-bold">{formatCurrency(stats.fuelStats.totalFuelSpend)}</p>
+              </div>
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground">Registra al menos 2 cargas para ver el consumo.</p>
+          )}
+        </div>
+      </Card>
+
       {/* Próximos recordatorios */}
       {reminders && reminders.length > 0 && (
         <Card className="overflow-hidden">

@@ -62,6 +62,14 @@ export function useVehicleStats(id: string | null | undefined) {
   });
 }
 
+export function useVehicleFuelStats(id: string | null | undefined) {
+  return useQuery({
+    queryKey: ["fuel-stats", id],
+    queryFn: () => api.get<FuelStats>(`/api/vehicle/${id}/fuel-stats`),
+    enabled: !!id,
+  });
+}
+
 export function useVehicleMaintenance(id: string | null | undefined) {
   return useQuery({
     queryKey: ["maintenance", id],
@@ -420,3 +428,24 @@ export interface DashboardData {
 
 // Use Document alias (Document is a DOM global)
 export type Doc = VehicleDocument;
+
+export interface FuelStats {
+  totalLiters: number;
+  totalFuelSpend: number;
+  litersThisMonth: number;
+  spendThisMonth: number;
+  litersThisYear: number;
+  spendThisYear: number;
+  avgConsumption: number | null; // km/L
+  avgPricePerL: number;
+  costPerKm: number | null;
+  totalDistance: number;
+  fuelingCount: number;
+  lastFueling: Fueling | null;
+  monthlyTrend: {
+    month: string; liters: number; spend: number;
+    kmPerL: number | null; distance: number;
+  }[];
+  consumptionPoints: { date: string; mileage: number; kmPerL: number | null }[];
+  fuelings: Fueling[];
+}

@@ -207,6 +207,45 @@ export async function POST() {
           fullTank: true,
         },
       });
+      await tx.fueling.create({
+        data: {
+          vehicleId: v1.id,
+          date: monthsAgo(2),
+          mileage: 142800,
+          liters: 40,
+          pricePerL: 21.8,
+          total: 872,
+          fuelType: "REGULAR",
+          station: "Shell",
+          fullTank: true,
+        },
+      });
+      await tx.fueling.create({
+        data: {
+          vehicleId: v1.id,
+          date: monthsAgo(3),
+          mileage: 141500,
+          liters: 44,
+          pricePerL: 21.5,
+          total: 946,
+          fuelType: "REGULAR",
+          station: "PEMEX",
+          fullTank: true,
+        },
+      });
+      await tx.fueling.create({
+        data: {
+          vehicleId: v1.id,
+          date: monthsAgo(4),
+          mileage: 140200,
+          liters: 43,
+          pricePerL: 21.3,
+          total: 916,
+          fuelType: "REGULAR",
+          station: "PEMEX",
+          fullTank: true,
+        },
+      });
 
       // === Toyota: recordatorios ===
       await tx.reminder.create({
@@ -335,6 +374,45 @@ export async function POST() {
           liters: 60,
           pricePerL: 24.0,
           total: 1440,
+          fuelType: "REGULAR",
+          station: "PEMEX",
+          fullTank: true,
+        },
+      });
+      await tx.fueling.create({
+        data: {
+          vehicleId: v2.id,
+          date: monthsAgo(1),
+          mileage: 217800,
+          liters: 58,
+          pricePerL: 23.7,
+          total: 1374.6,
+          fuelType: "REGULAR",
+          station: "PEMEX",
+          fullTank: true,
+        },
+      });
+      await tx.fueling.create({
+        data: {
+          vehicleId: v2.id,
+          date: monthsAgo(2),
+          mileage: 216100,
+          liters: 62,
+          pricePerL: 23.5,
+          total: 1457,
+          fuelType: "REGULAR",
+          station: "Shell",
+          fullTank: true,
+        },
+      });
+      await tx.fueling.create({
+        data: {
+          vehicleId: v2.id,
+          date: monthsAgo(3),
+          mileage: 214400,
+          liters: 59,
+          pricePerL: 23.2,
+          total: 1368.8,
           fuelType: "REGULAR",
           station: "PEMEX",
           fullTank: true,

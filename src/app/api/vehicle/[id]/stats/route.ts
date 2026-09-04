@@ -78,15 +78,15 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     const lastKm = fuelings[fuelings.length - 1].mileage;
     const distance = lastKm - firstKm;
     if (distance > 0) {
-      // Consumo: litros (excepto el primer tanque) / distancia * 100 -> L/100km o km/L
-      // Aquí usamos km/L = distancia / litros_totales_tanques_intermedios
       const litersBetween = fuelings.slice(1).reduce((s, f) => s + f.liters, 0);
       if (litersBetween > 0) {
-        avgConsumption = distance / litersBetween;
+        avgConsumption = Math.round((distance / litersBetween) * 100) / 100;
       }
     }
   }
-  const costPerKm = totalFuelSpend > 0 && vehicle.mileage > 0 ? totalFuelSpend / vehicle.mileage : 0;
+  const costPerKm = totalFuelSpend > 0 && vehicle.mileage > 0
+    ? Math.round((totalFuelSpend / vehicle.mileage) * 100) / 100
+    : null;
 
   // Recent activity (last 5 from history)
    

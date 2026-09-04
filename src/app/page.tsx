@@ -15,6 +15,7 @@ import { HistoryView } from "@/components/views/history-view";
 import { DocumentsView } from "@/components/views/documents-view";
 import { SearchView } from "@/components/views/search-view";
 import { InsightsView } from "@/components/views/insights-view";
+import { FuelView } from "@/components/views/fuel-view";
 import { FormView } from "@/components/views/form-view";
 import { useVehicles, useSeedDemo } from "@/lib/queries";
 import { Car, Loader2 } from "lucide-react";
@@ -75,6 +76,7 @@ export default function Home() {
       {view === "documents" && <DocumentsView />}
       {view === "search" && <SearchView />}
       {view === "insights" && <InsightsView />}
+      {view === "fuel" && <FuelView />}
     </AppShell>
   );
 }

@@ -155,6 +155,42 @@ export function DashboardView() {
           </Button>
         </section>
 
+        {/* Combustible */}
+        <section>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Combustible</h2>
+          </div>
+          <Card className="overflow-hidden divide-y">
+            {data.vehicles.map((v) => {
+              const fs = (v as any).fuelStats;
+              return (
+                <button
+                  key={v.id}
+                  onClick={() => setView("fuel", { id: v.id })}
+                  className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-muted/30 tap-feedback"
+                >
+                  <span className="grid place-items-center h-9 w-9 rounded-xl bg-fuchsia-100 dark:bg-fuchsia-950/40 text-base shrink-0">⛽</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{v.make} {v.model}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {fs && fs.fuelingCount > 0
+                        ? `${fs.fuelingCount} cargas · ${fs.totalLiters} L · ${formatCurrency(fs.totalFuelSpend)}`
+                        : "Sin cargas registradas"}
+                    </p>
+                  </div>
+                  {fs && fs.avgConsumption !== null && (
+                    <div className="text-right shrink-0">
+                      <p className="text-sm font-bold text-primary">{fs.avgConsumption}</p>
+                      <p className="text-[10px] text-muted-foreground">km/L</p>
+                    </div>
+                  )}
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </button>
+              );
+            })}
+          </Card>
+        </section>
+
         {/* Última actividad */}
         {data.recentActivity.length > 0 && (
           <section>
