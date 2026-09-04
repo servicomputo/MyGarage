@@ -1,0 +1,19 @@
+{
+  "name": "GarageBitácora — Control de Vehículos",
+  "short_name": "GarageBitácora",
+  "description": "Bitácora digital inteligente para el control y mantenimiento de tus vehículos.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "categories": ["utilities", "productivity", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
