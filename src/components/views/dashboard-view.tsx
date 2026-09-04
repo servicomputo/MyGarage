@@ -1,6 +1,5 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { useDashboard, useSeedDemo, type DashboardData } from "@/lib/queries";
 import { useNav, openVehicle, openQuickRegister } from "@/lib/store";
 import { formatCurrency, formatMileage, formatRelativeTime, getReminderStatus, STATUS_COLOR, type ReminderStatus } from "@/lib/format";
@@ -13,13 +12,12 @@ import { Search, ChevronRight, Plus, Sparkles, Bell, TrendingUp, Loader2 } from 
 import { toast } from "sonner";
 
 export function DashboardView() {
-  const { data: session } = useSession();
   const { data, isLoading, refetch } = useDashboard();
   const setView = useNav((s) => s.setView);
   const seed = useSeedDemo();
 
   const greeting = data?.greeting ?? "Hola";
-  const name = session?.user?.name?.split(" ")[0];
+  const name = "Usuario";
 
   if (isLoading) {
     return (

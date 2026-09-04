@@ -1,21 +1,14 @@
 "use client";
 
-import { signOut, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { TopBar } from "@/components/top-bar";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { useNav } from "@/lib/store";
 import {
-  Bell, History, FileText, Sparkles, LogOut, ChevronRight, Car, Info, Shield, Github,
+  Bell, History, FileText, Sparkles, ChevronRight, Car, Info, Shield, User,
 } from "lucide-react";
-import { toast } from "sonner";
 
 export function MoreView() {
-  const { data: session } = useSession();
   const setView = useNav((s) => s.setView);
-  const reset = useNav((s) => s.reset);
-  const router = useRouter();
 
   const menu = [
     { icon: Bell, label: "Recordatorios", desc: "Mantenimientos próximos y vencidos", onClick: () => setView("reminders") },
@@ -32,11 +25,11 @@ export function MoreView() {
         {/* Perfil */}
         <Card className="p-4 flex items-center gap-3">
           <div className="h-12 w-12 rounded-full bg-primary/15 grid place-items-center text-primary font-bold text-lg">
-            {(session?.user?.name || "U").charAt(0).toUpperCase()}
+            U
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold truncate">{session?.user?.name || "Usuario"}</p>
-            <p className="text-xs text-muted-foreground truncate">{session?.user?.email}</p>
+            <p className="font-semibold truncate">Usuario Demo</p>
+            <p className="text-xs text-muted-foreground truncate">Sesión local · datos guardados en este dispositivo</p>
           </div>
         </Card>
 
@@ -84,19 +77,6 @@ export function MoreView() {
             </div>
           </div>
         </Card>
-
-        <Button
-          variant="outline"
-          className="w-full h-11 text-destructive hover:text-destructive"
-          onClick={async () => {
-            await signOut({ redirect: false });
-            reset();
-            toast.success("Sesión cerrada");
-            router.refresh();
-          }}
-        >
-          <LogOut className="mr-2 h-4 w-4" /> Cerrar sesión
-        </Button>
 
         <p className="text-center text-xs text-muted-foreground pb-2">
           Hecho con ❤️ para tu vehículo
