@@ -20,6 +20,7 @@ export const MAINTENANCE_TYPES: ServiceTypeOption[] = [
   { value: "ELECTRICAL", label: "Sistema eléctrico", emoji: "🔌", color: "yellow" },
   { value: "REPAIR", label: "Reparación", emoji: "🧰", color: "red" },
   { value: "FUEL", label: "Combustible", emoji: "⛽", color: "fuchsia" },
+  { value: "WASH", label: "Lavado", emoji: "🧽", color: "sky" },
   { value: "VERIFICATION", label: "Verificación", emoji: "📋", color: "teal" },
   { value: "INSURANCE", label: "Seguro", emoji: "🛡️", color: "violet" },
   { value: "TAX", label: "Tenencia", emoji: "📄", color: "purple" },

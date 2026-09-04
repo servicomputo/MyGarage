@@ -224,7 +224,7 @@ export function QuickRegisterView({ preset }: { preset?: string }) {
             {/* Campos rápidos */}
             <Card className="p-4 space-y-3">
               <div>
-                <Label className="text-xs font-medium text-muted-foreground">Kilometraje actual</Label>
+                <Label className="text-xs font-medium text-muted-foreground">Kilometraje del servicio</Label>
                 <div className="flex items-baseline gap-2 mt-1">
                   <Input
                     type="number"
@@ -235,6 +235,16 @@ export function QuickRegisterView({ preset }: { preset?: string }) {
                   />
                   <span className="text-sm text-muted-foreground">km</span>
                 </div>
+                {vehicle && mileage > vehicle.mileage && (
+                  <p className="text-[11px] text-primary mt-1.5 flex items-center gap-1">
+                    ↑ Actualizará el kilometraje del vehículo de {formatMileage(vehicle.mileage)} a {formatMileage(mileage)}
+                  </p>
+                )}
+                {vehicle && mileage < vehicle.mileage && (
+                  <p className="text-[11px] text-muted-foreground mt-1.5">
+                    Servicio histórico (no actualiza el kilometraje actual del vehículo: {formatMileage(vehicle.mileage)})
+                  </p>
+                )}
               </div>
               <div>
                 <Label className="text-xs font-medium text-muted-foreground">Fecha</Label>

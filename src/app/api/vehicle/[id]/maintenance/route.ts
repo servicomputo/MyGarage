@@ -90,7 +90,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         await tx.expense.create({
           data: {
             vehicleId: id,
-            category: "MAINTENANCE",
+            category: mapMaintenanceToExpenseCategory(d.type),
             title: maintenanceDescription(d.type, d.customType),
             amount: totalCost,
             date,
@@ -143,6 +143,7 @@ function maintenanceDescription(type: string, custom?: string | null): string {
     ELECTRICAL: "Sistema eléctrico",
     REPAIR: "Reparación",
     FUEL: "Combustible",
+    WASH: "Lavado",
     VERIFICATION: "Verificación",
     INSURANCE: "Seguro",
     TAX: "Tenencia",
@@ -164,4 +165,27 @@ function mapMaintenanceToReminder(type: string): string | null {
     TAX: "TAX",
   };
   return map[type] ?? null;
+}
+
+// Mapea el tipo de mantenimiento a la categoría de gasto correspondiente
+function mapMaintenanceToExpenseCategory(type: string): string {
+  const map: Record<string, string> = {
+    OIL_CHANGE: "MAINTENANCE",
+    GENERAL_SERVICE: "MAINTENANCE",
+    TIRES: "TIRES",
+    BRAKES: "REPAIRS",
+    BATTERY: "PARTS",
+    COOLANT: "MAINTENANCE",
+    TRANSMISSION: "MAINTENANCE",
+    AC: "MAINTENANCE",
+    ELECTRICAL: "MAINTENANCE",
+    REPAIR: "REPAIRS",
+    FUEL: "FUEL",
+    WASH: "WASH",
+    VERIFICATION: "VERIFICATION",
+    INSURANCE: "INSURANCE",
+    TAX: "TAXES",
+    OTHER: "OTHER",
+  };
+  return map[type] ?? "MAINTENANCE";
 }
