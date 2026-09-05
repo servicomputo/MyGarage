@@ -16,7 +16,8 @@ export function DashboardView() {
   const setView = useNav((s) => s.setView);
   const seed = useSeedDemo();
 
-  const greeting = data?.greeting ?? "Hola";
+  // Calcular saludo con la hora LOCAL del navegador (no la del servidor UTC)
+  const greeting = getLocalGreeting();
   const name = "Usuario";
 
   if (isLoading) {
@@ -363,6 +364,14 @@ function getGreetingEmoji(): string {
   if (h < 12) return "☀️";
   if (h < 19) return "🌤️";
   return "🌙";
+}
+
+// Saludo basado en la hora LOCAL del navegador del usuario
+function getLocalGreeting(): string {
+  const h = new Date().getHours();
+  if (h < 12) return "Buenos días";
+  if (h < 19) return "Buenas tardes";
+  return "Buenas noches";
 }
 
 // Frases motivacionales rotativas
