@@ -289,13 +289,25 @@
   animation: logoEntrance 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-/* Ondas concéntricas */
+/* Ondas concéntricas — más visibles y dramáticas */
 @keyframes ripple {
-  0% { transform: scale(0.8); opacity: 0.6; }
-  100% { transform: scale(2.4); opacity: 0; }
+  0% {
+    transform: scale(0.4);
+    opacity: 0.8;
+    border-width: 3px;
+  }
+  50% {
+    opacity: 0.4;
+    border-width: 2px;
+  }
+  100% {
+    transform: scale(2.8);
+    opacity: 0;
+    border-width: 1px;
+  }
 }
 .animate-ripple {
-  animation: ripple 2s ease-out infinite;
+  animation: ripple 1.8s ease-out infinite;
 }
 
 /* Bouncing dots (loading) */
