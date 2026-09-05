@@ -68,8 +68,17 @@ export function openVehicle(id: string) {
   setView("vehicle-detail", { id });
 }
 
+// Helper para abrir el registro rápido desde el FAB.
+// Si no se pasa vehicleId, limpia el selectedVehicleId para forzar
+// el selector de vehículo (no asumir el último usado).
 export function openQuickRegister(vehicleId?: string) {
-  const { setView, selectVehicle, selectedVehicleId } = useNav.getState();
-  if (vehicleId) selectVehicle(vehicleId);
-  setView("quick-register", { id: vehicleId ?? selectedVehicleId ?? "" });
+  const { setView, selectVehicle } = useNav.getState();
+  if (vehicleId) {
+    selectVehicle(vehicleId);
+    setView("quick-register", { id: vehicleId });
+  } else {
+    // Sin vehículo específico → limpiar para mostrar selector
+    selectVehicle(null);
+    setView("quick-register", { id: "" });
+  }
 }

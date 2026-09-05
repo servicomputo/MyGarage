@@ -20,7 +20,7 @@ import { FormView } from "@/components/views/form-view";
 import { useVehicles, useSeedDemo } from "@/lib/queries";
 import { SplashScreen } from "@/components/splash-screen";
 
-const SPLASH_MIN_DURATION = 1500; // 1.5s mínimo para que se aprecie la animación
+const SPLASH_MIN_DURATION = 2500; // 2.5s para que se aprecien las ondas y el logo
 
 export default function Home() {
   const view = useNav((s) => s.view);
@@ -28,22 +28,15 @@ export default function Home() {
   const seed = useSeedDemo();
   const seededRef = useRef(false);
 
-  // Estado del splash: se muestra al menos SPLASH_MIN_DURATION ms por sesión
-  const [showSplash, setShowSplash] = useState(false);
+  // Estado del splash: se muestra al inicio siempre (no usar sessionStorage)
+  const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
-    // Mostrar splash solo una vez por sesión del navegador
-    const alreadyShown = typeof window !== "undefined" && sessionStorage.getItem("splashShown");
-    if (!alreadyShown) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setShowSplash(true);
-      const timer = setTimeout(() => {
-         
-        setShowSplash(false);
-        sessionStorage.setItem("splashShown", "1");
-      }, SPLASH_MIN_DURATION);
-      return () => clearTimeout(timer);
-    }
+    const timer = setTimeout(() => {
+       
+      setShowSplash(false);
+    }, SPLASH_MIN_DURATION);
+    return () => clearTimeout(timer);
   }, []);
 
   // Auto-cargar datos de ejemplo la primera vez si no hay vehículos

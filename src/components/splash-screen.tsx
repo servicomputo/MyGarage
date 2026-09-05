@@ -15,11 +15,12 @@ export function SplashScreen() {
         }}
       />
 
-      {/* Ondas concéntricas detrás del logo */}
+      {/* Ondas concéntricas detrás del logo — más grandes y visibles */}
       <div className="absolute inset-0 grid place-items-center pointer-events-none">
-        <div className="h-48 w-48 rounded-full border-2 border-primary/20 animate-ripple" />
-        <div className="h-48 w-48 rounded-full border-2 border-primary/20 animate-ripple absolute" style={{ animationDelay: "0.6s" }} />
-        <div className="h-48 w-48 rounded-full border-2 border-primary/20 animate-ripple absolute" style={{ animationDelay: "1.2s" }} />
+        <div className="h-40 w-40 rounded-full border-2 border-primary/30 animate-ripple" />
+        <div className="h-40 w-40 rounded-full border-2 border-primary/25 animate-ripple absolute" style={{ animationDelay: "0.5s" }} />
+        <div className="h-40 w-40 rounded-full border-2 border-primary/20 animate-ripple absolute" style={{ animationDelay: "1s" }} />
+        <div className="h-40 w-40 rounded-full border-2 border-primary/15 animate-ripple absolute" style={{ animationDelay: "1.5s" }} />
       </div>
 
       {/* Contenido principal */}
