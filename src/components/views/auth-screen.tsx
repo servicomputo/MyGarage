@@ -79,7 +79,7 @@ export function AuthScreen() {
           <div className="h-16 w-16 rounded-2xl bg-primary text-primary-foreground grid place-items-center shadow-lg shadow-primary/30 mb-3">
             <Car className="h-8 w-8" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">GarageBitácora</h1>
+          <h1 className="text-2xl font-bold tracking-tight">My Garage</h1>
           <p className="text-sm text-muted-foreground mt-1 text-center">
             La bitácora inteligente de tus vehículos
           </p>

@@ -18,7 +18,7 @@ import { InsightsView } from "@/components/views/insights-view";
 import { FuelView } from "@/components/views/fuel-view";
 import { FormView } from "@/components/views/form-view";
 import { useVehicles, useSeedDemo } from "@/lib/queries";
-import { Car, Loader2 } from "lucide-react";
+import { SplashScreen } from "@/components/splash-screen";
 
 export default function Home() {
   const view = useNav((s) => s.view);
@@ -37,19 +37,7 @@ export default function Home() {
 
   // Splash inicial mientras cargan los datos
   if (vehiclesLoading && !vehicles) {
-    return (
-      <div className="min-h-screen grid place-items-center bg-background">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-12 w-12 rounded-2xl bg-primary text-primary-foreground grid place-items-center shadow-lg shadow-primary/30">
-            <Car className="h-6 w-6" />
-          </div>
-          <div className="flex items-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">Cargando tu garage...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <SplashScreen />;
   }
 
   const isFormView = ["add-maintenance", "add-part", "add-expense", "add-fuel", "add-reminder", "add-document"].includes(view);
@@ -61,7 +49,7 @@ export default function Home() {
   ].includes(view);
 
   return (
-    <AppShell showNav={showBottomNav}>
+    <AppShell showNav={showBottomNav} viewKey={view}>
       {view === "dashboard" && <DashboardView />}
       {view === "vehicles" && <VehiclesView />}
       {view === "vehicle-detail" && <VehicleDetailView />}

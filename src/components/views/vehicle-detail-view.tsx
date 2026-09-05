@@ -26,10 +26,12 @@ import { EmptyState, StatusBadge, ServiceIcon, StatPill } from "@/components/ui-
 import {
   formatMileage,
   formatCurrency,
+  formatNumber,
   formatDate,
   formatRelativeTime,
   getReminderStatus,
   getVehicleStatus,
+  getCareBadges,
 } from "@/lib/format";
 import { getMaintenanceType, getPartCategory, getExpenseCategory, getReminderType, getDocumentType, colorClasses, REMINDER_TYPES } from "@/lib/constants";
 import {
@@ -102,37 +104,42 @@ export function VehicleDetailView() {
         }
       />
 
-      {/* Header con foto */}
+      {/* Header con foto — hero del vehículo */}
       <div className="px-4 pt-2">
-        <Card className="overflow-hidden">
-          <div className="relative h-40 bg-muted">
+        <Card className="overflow-hidden card-elevated animate-fade-up">
+          <div className="relative h-44 bg-muted">
             {vehicle.photo ? (
-               
               <img src={vehicle.photo} alt={vehicle.make} className="h-full w-full object-cover" />
             ) : (
               <div className="h-full w-full grid place-items-center text-5xl">🚗</div>
             )}
-            <div className="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/70 to-transparent">
-              <div className="flex items-end justify-between gap-2">
-                <div className="text-white">
-                  <p className="text-xs opacity-90">{vehicle.color}{vehicle.version ? ` · ${vehicle.version}` : ""}</p>
-                </div>
+            {/* Overlay con degradado más rico */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+            {/* Nombre del vehículo sobre la foto */}
+            <div className="absolute bottom-0 inset-x-0 p-4">
+              <p className="text-white text-lg font-bold drop-shadow-lg">
+                {vehicle.make} {vehicle.model}
+              </p>
+              <div className="flex items-center justify-between gap-2 mt-0.5">
+                <p className="text-white/90 text-xs">
+                  {vehicle.year}{vehicle.color ? ` · ${vehicle.color}` : ""}{vehicle.plates ? ` · ${vehicle.plates}` : ""}
+                </p>
                 <StatusBadge status={vehicleStatus.status} label={vehicleStatus.label} />
               </div>
             </div>
           </div>
           <div className="grid grid-cols-4 divide-x">
-            <HeaderStat icon={Gauge} label="Km actual" value={formatMileage(vehicle.mileage).replace(" km", "")} unit="km" />
+            <HeaderStat icon={Gauge} label="Km actual" value={formatNumber(vehicle.mileage)} unit="km" />
             <HeaderStat icon={Wrench} label="Servicios" value={String(stats?.maintenanceCount ?? 0)} />
             <HeaderStat icon={Package} label="Refacciones" value={String(stats?.partsCount ?? 0)} />
-            <HeaderStat icon={TrendingUp} label="Gastado" value={formatCurrency(stats?.totalSpend ?? 0).replace("$", "$")} />
+            <HeaderStat icon={TrendingUp} label="Gastado" value={formatCurrency(stats?.totalSpend ?? 0)} />
           </div>
         </Card>
       </div>
 
       {/* Botón principal de registro */}
       <div className="px-4 pt-3">
-        <Button className="w-full h-12 text-base" onClick={() => openQuickRegister(id)}>
+        <Button className="w-full h-12 text-base animate-fade-up glow-primary tap-feedback shine-on-hover" onClick={() => openQuickRegister(id)}>
           <Plus className="mr-2 h-5 w-5" /> Registrar mantenimiento
         </Button>
       </div>
@@ -148,20 +155,14 @@ export function VehicleDetailView() {
             <TabsTrigger value="documents" className="text-xs py-2">Docs.</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="summary" className="mt-3">
-            <SummaryTab vehicleId={id} />
-          </TabsContent>
-          <TabsContent value="maintenance" className="mt-3">
-            <MaintenanceTab vehicleId={id} />
-          </TabsContent>
-          <TabsContent value="parts" className="mt-3">
-            <PartsTab vehicleId={id} />
-          </TabsContent>
-          <TabsContent value="expenses" className="mt-3">
-            <ExpensesTab vehicleId={id} />
-          </TabsContent>
-          <TabsContent value="documents" className="mt-3">
-            <DocumentsTab vehicleId={id} />
+          <TabsContent value={tab} className="mt-3 tab-enter" forceMount>
+            <div key={tab}>
+              {tab === "summary" && <SummaryTab vehicleId={id} />}
+              {tab === "maintenance" && <MaintenanceTab vehicleId={id} />}
+              {tab === "parts" && <PartsTab vehicleId={id} />}
+              {tab === "expenses" && <ExpensesTab vehicleId={id} />}
+              {tab === "documents" && <DocumentsTab vehicleId={id} />}
+            </div>
           </TabsContent>
         </Tabs>
       </div>
@@ -239,6 +240,42 @@ function SummaryTab({ vehicleId }: { vehicleId: string }) {
         <StatPill label="Este mes" value={formatCurrency(stats.thisMonth)} />
         <StatPill label="Este año" value={formatCurrency(stats.thisYear)} />
       </div>
+
+      {/* Insignias de cuidado (gamificación) */}
+      {(() => {
+        const badges = getCareBadges({
+          maintenanceCount: stats.maintenanceCount,
+          totalSpend: stats.totalSpend,
+          hasReminders: (stats as any).hasReminders ?? false,
+          overdueCount: (stats as any).overdueCount ?? 0,
+          fuelingCount: (stats as any).fuelingCount ?? 0,
+          documentsCount: (stats as any).documentsCount ?? 0,
+        });
+        if (badges.length === 0) return null;
+        return (
+          <Card className="p-3 animate-fade-up">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1">
+              <Sparkles className="h-3 w-3" /> Insignias de cuidado
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {badges.map((b, i) => {
+                const c = colorClasses(b.color);
+                return (
+                  <div
+                    key={i}
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg ${c.bgSoft} ${c.text} animate-pop`}
+                    style={{ animationDelay: `${i * 0.08}s` }}
+                    title={b.description}
+                  >
+                    <span className="text-base">{b.emoji}</span>
+                    <span className="text-[11px] font-semibold">{b.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        );
+      })()}
 
       {/* Último mantenimiento */}
       {stats.lastMaintenance && (

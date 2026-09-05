@@ -65,7 +65,7 @@ export function MoreView() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium">Acerca de</p>
-              <p className="text-xs text-muted-foreground">GarageBitácora v1.0 · PWA</p>
+              <p className="text-xs text-muted-foreground">My Garage v1.0 · PWA</p>
             </div>
           </div>
           <div className="flex items-center gap-3 px-4 py-3">

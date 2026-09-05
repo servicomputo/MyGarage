@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { STATUS_COLOR, type ReminderStatus } from "@/lib/format";
@@ -15,13 +16,17 @@ interface EmptyStateProps {
 
 export function EmptyState({ icon, emoji, title, description, action }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center text-center py-12 px-6">
-      <div className="mb-3 grid place-items-center h-16 w-16 rounded-2xl bg-muted">
-        {emoji ? <span className="text-3xl">{emoji}</span> : icon}
+    <div className="flex flex-col items-center justify-center text-center py-16 px-6 animate-fade-up">
+      <div className="relative mb-4">
+        {/* Ondas detrás del emoji */}
+        <div className="absolute inset-0 rounded-2xl bg-primary/10 animate-soft-pulse" />
+        <div className="relative grid place-items-center h-20 w-20 rounded-2xl bg-gradient-to-br from-muted to-muted/50">
+          {emoji ? <span className="text-4xl animate-float">{emoji}</span> : icon}
+        </div>
       </div>
       <h3 className="text-base font-semibold">{title}</h3>
       {description && <p className="mt-1 text-sm text-muted-foreground max-w-xs">{description}</p>}
-      {action && <div className="mt-4">{action}</div>}
+      {action && <div className="mt-5 animate-fade-in" style={{ animationDelay: "0.2s" }}>{action}</div>}
     </div>
   );
 }
@@ -39,7 +44,7 @@ export function StatusBadge({ status, label, className }: StatusBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium animate-pop",
         c.bg,
         c.text,
         className
@@ -145,4 +150,52 @@ export function ListRow({ icon, title, subtitle, right, onClick, className }: Li
       {right}
     </Comp>
   );
+}
+
+// === AnimatedNumber ===
+// Anima el conteo de un número desde 0 (o el valor anterior) hasta el valor final.
+interface AnimatedNumberProps {
+  value: number;
+  format?: (n: number) => string;
+  duration?: number; // ms
+  className?: string;
+}
+
+export function AnimatedNumber({ value, format, duration = 700, className }: AnimatedNumberProps) {
+  const [display, setDisplay] = useState(0);
+  const fromRef = useRef(0);
+  const rafRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const from = fromRef.current;
+    const to = value;
+    const start = performance.now();
+    const diff = to - from;
+
+    function tick(now: number) {
+      const elapsed = now - start;
+      const t = Math.min(1, elapsed / duration);
+      // easing easeOutCubic
+      const eased = 1 - Math.pow(1 - t, 3);
+      const current = from + diff * eased;
+      setDisplay(current);
+      if (t < 1) {
+        rafRef.current = requestAnimationFrame(tick);
+      } else {
+        fromRef.current = to;
+        setDisplay(to);
+      }
+    }
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      fromRef.current = to;
+    };
+  }, [value, duration]);
+
+  const fmt = format ?? ((n: number) => Math.round(n).toString());
+  // Redondear el valor animado para evitar decimales ruidosos
+  const rounded = Math.round(display * 100) / 100;
+  return <span className={className}>{fmt(rounded)}</span>;
 }

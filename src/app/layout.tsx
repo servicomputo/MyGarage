@@ -9,20 +9,20 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "GarageBitácora — Control de tus vehículos",
+  title: "My Garage — Control de tus vehículos",
   description:
     "Bitácora digital inteligente para el control y mantenimiento de tus vehículos. Registra servicios, refacciones, gastos, recordatorios y documentos.",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "GarageBitácora",
+    title: "My Garage",
   },
   icons: {
     icon: "/icon.svg",
     apple: "/icon.svg",
   },
-  applicationName: "GarageBitácora",
+  applicationName: "My Garage",
   formatDetection: { telephone: false },
 };
 

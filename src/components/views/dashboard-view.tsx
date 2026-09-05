@@ -7,7 +7,7 @@ import { getMaintenanceType, getReminderType, colorClasses } from "@/lib/constan
 import { TopBar } from "@/components/top-bar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { EmptyState, StatusBadge, ServiceIcon } from "@/components/ui-bits";
+import { EmptyState, StatusBadge, ServiceIcon, AnimatedNumber } from "@/components/ui-bits";
 import { Search, ChevronRight, Plus, Sparkles, Bell, TrendingUp, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -73,7 +73,7 @@ export function DashboardView() {
   return (
     <div className="min-h-screen pb-4">
       <TopBar
-        title={`${greeting}${name ? `, ${name}` : ""}`}
+        title="My Garage"
         right={
           <button onClick={() => setView("search")} className="grid place-items-center h-9 w-9 rounded-full hover:bg-muted tap-feedback" aria-label="Buscar">
             <Search className="h-5 w-5" />
@@ -81,14 +81,25 @@ export function DashboardView() {
         }
       />
 
-      <div className="px-4 space-y-4 mt-2">
+      <div className="px-4 space-y-5 mt-3">
+        {/* Banner motivacional con saludo */}
+        <div className="rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 p-4 animate-fade-up shine-on-hover">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl animate-float">{getGreetingEmoji()}</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-base font-bold text-foreground">{greeting}, {name}</p>
+              <p className="text-xs text-muted-foreground mt-0.5 italic">"{getMotivationalPhrase()}"</p>
+            </div>
+          </div>
+        </div>
+
         {/* Mis vehículos */}
         <section>
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Mis vehículos</h2>
             <button onClick={() => setView("vehicles")} className="text-xs text-primary font-medium">Ver todos</button>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-3 stagger">
             {data.vehicles.map((v) => (
               <VehicleCard key={v.id} vehicle={v} />
             ))}
@@ -136,18 +147,24 @@ export function DashboardView() {
         {/* Gastos */}
         <section>
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">Gastos</h2>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2 stagger">
             <Card className="p-3">
               <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Este mes</p>
-              <p className="text-base font-bold mt-0.5">{formatCurrency(data.totalSpendThisMonth)}</p>
+              <p className="text-base font-bold mt-0.5">
+                <AnimatedNumber value={data.totalSpendThisMonth} format={(n) => formatCurrency(n)} />
+              </p>
             </Card>
             <Card className="p-3">
               <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Este año</p>
-              <p className="text-base font-bold mt-0.5">{formatCurrency(data.totalSpendThisYear)}</p>
+              <p className="text-base font-bold mt-0.5">
+                <AnimatedNumber value={data.totalSpendThisYear} format={(n) => formatCurrency(n)} />
+              </p>
             </Card>
             <Card className="p-3">
               <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Histórico</p>
-              <p className="text-base font-bold mt-0.5">{formatCurrency(data.totalSpendAllTime)}</p>
+              <p className="text-base font-bold mt-0.5">
+                <AnimatedNumber value={data.totalSpendAllTime} format={(n) => formatCurrency(n)} />
+              </p>
             </Card>
           </div>
           <Button variant="ghost" size="sm" className="w-full mt-1 text-primary" onClick={() => setView("expenses")}>
@@ -221,17 +238,20 @@ function VehicleCard({ vehicle }: { vehicle: DashboardData["vehicles"][number] }
 
   return (
     <Card
-      className="overflow-hidden cursor-pointer tap-feedback animate-fade-up"
+      className="overflow-hidden cursor-pointer tap-feedback card-elevated shine-on-hover animate-fade-up"
       onClick={(e) => {
         (e.currentTarget as HTMLElement).blur();
         openVehicle(v.id);
       }}
     >
-      <div className="flex gap-3 p-3">
-        <div className="relative h-20 w-28 rounded-lg overflow-hidden bg-muted shrink-0">
+      <div className="flex gap-4 p-4">
+        <div className="relative h-20 w-28 rounded-xl overflow-hidden bg-muted shrink-0">
           {v.photo ? (
-             
-            <img src={v.photo} alt={`${v.make} ${v.model}`} className="h-full w-full object-cover" />
+            <>
+              <img src={v.photo} alt={`${v.make} ${v.model}`} className="h-full w-full object-cover" />
+              {/* Overlay sutil para uniformizar fotos */}
+              <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black/10" />
+            </>
           ) : (
             <div className="h-full w-full grid place-items-center text-2xl">🚗</div>
           )}
@@ -244,7 +264,9 @@ function VehicleCard({ vehicle }: { vehicle: DashboardData["vehicles"][number] }
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
           </div>
-          <p className="text-sm font-semibold mt-1">{formatMileage(v.mileage)}</p>
+          <p className="text-sm font-semibold mt-1">
+            <AnimatedNumber value={v.mileage} format={(n) => formatMileage(Math.round(n))} />
+          </p>
           <div className="mt-1.5">
             <StatusBadge status={status} label={statusLabel} />
           </div>
@@ -332,4 +354,28 @@ function ActivityRow({ item }: { item: DashboardData["recentActivity"][number] }
     );
   }
   return null;
+}
+
+// Emoji dinámico según la hora del día
+function getGreetingEmoji(): string {
+  const h = new Date().getHours();
+  if (h < 6) return "🌙";
+  if (h < 12) return "☀️";
+  if (h < 19) return "🌤️";
+  return "🌙";
+}
+
+// Frases motivacionales rotativas
+const MOTIVATIONAL_PHRASES = [
+  "Cuida tu auto, y él te cuidará a ti",
+  "Un auto bien mantenido es un auto feliz",
+  "Cada kilómetro cuenta, mantenlo al día",
+  "La prevención es la mejor reparación",
+  "Tu vehículo es tu compañero de viaje",
+  "Mantén el ritmo, mantén tu auto",
+  "El mejor taller es la prevención",
+];
+function getMotivationalPhrase(): string {
+  const day = new Date().getDate();
+  return MOTIVATIONAL_PHRASES[day % MOTIVATIONAL_PHRASES.length];
 }

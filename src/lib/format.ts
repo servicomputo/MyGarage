@@ -170,6 +170,46 @@ export function getVehicleStatus(
   return { status: "ok", label: "Todo en orden" };
 }
 
+// === Sistema de insignias de cuidado (gamificación) ===
+export interface CareBadge {
+  emoji: string;
+  label: string;
+  description: string;
+  color: string;
+}
+
+export function getCareBadges(stats: {
+  maintenanceCount: number;
+  totalSpend: number;
+  hasReminders: boolean;
+  overdueCount: number;
+  fuelingCount: number;
+  documentsCount: number;
+}): CareBadge[] {
+  const badges: CareBadge[] = [];
+
+  if (stats.maintenanceCount >= 2) {
+    badges.push({ emoji: "🔧", label: "Bien mantenido", description: "2+ servicios registrados", color: "emerald" });
+  }
+  if (stats.hasReminders && stats.overdueCount === 0) {
+    badges.push({ emoji: "✅", label: "Al día", description: "Sin mantenimientos vencidos", color: "emerald" });
+  }
+  if (stats.documentsCount >= 1) {
+    badges.push({ emoji: "📋", label: "Documentado", description: "Expediente completo", color: "sky" });
+  }
+  if (stats.fuelingCount >= 2) {
+    badges.push({ emoji: "⛽", label: "Monitoreado", description: "Consumo de combustible tracked", color: "fuchsia" });
+  }
+  if (stats.totalSpend >= 5000) {
+    badges.push({ emoji: "💎", label: "Cuidado premium", description: "Inversión significativa", color: "violet" });
+  }
+  if (stats.maintenanceCount >= 1 && stats.maintenanceCount < 2) {
+    badges.push({ emoji: "🌱", label: "En camino", description: "Primer servicio registrado", color: "emerald" });
+  }
+
+  return badges;
+}
+
 export function addDays(date: Date, days: number): Date {
   const d = new Date(date);
   d.setDate(d.getDate() + days);

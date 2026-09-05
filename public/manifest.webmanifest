@@ -1,6 +1,6 @@
 {
-  "name": "GarageBitácora — Control de Vehículos",
-  "short_name": "GarageBitácora",
+  "name": "My Garage — Control de Vehículos",
+  "short_name": "My Garage",
   "description": "Bitácora digital inteligente para el control y mantenimiento de tus vehículos.",
   "start_url": "/",
   "display": "standalone",

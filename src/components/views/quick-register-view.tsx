@@ -13,6 +13,7 @@ import { PhotoUpload } from "@/components/photo-upload";
 import { MAINTENANCE_TYPES, colorClasses } from "@/lib/constants";
 import { formatMileage, formatCurrency, todayLocalISO } from "@/lib/format";
 import { ChevronDown, ChevronRight, Loader2, Check } from "lucide-react";
+import { Confetti } from "@/components/confetti";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -48,6 +49,7 @@ export function QuickRegisterView({ preset }: { preset?: string }) {
   const [notes, setNotes] = useState("");
   const [photos, setPhotos] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [celebrate, setCelebrate] = useState(false);
 
   // Si no hay vehículo seleccionado, mostrar selector
   if (!vehicleId || !vehicle) {
@@ -123,8 +125,12 @@ export function QuickRegisterView({ preset }: { preset?: string }) {
         photos,
         createExpense: true,
       });
-      toast.success("Mantenimiento registrado");
-      setView("vehicle-detail", { id: vehicleId });
+      setCelebrate(true);
+      toast.success("✨ ¡Mantenimiento registrado!", {
+        description: "Tu vehículo está un paso más cerca del 100%",
+      });
+      // Esperar a que se vea el confetti antes de navegar
+      setTimeout(() => setView("vehicle-detail", { id: vehicleId }), 900);
     } catch (e) {
       toast.error("No se pudo registrar");
     } finally {
@@ -136,6 +142,7 @@ export function QuickRegisterView({ preset }: { preset?: string }) {
 
   return (
     <div className="min-h-screen">
+      <Confetti show={celebrate} onDone={() => setCelebrate(false)} />
       <TopBar title="Registrar mantenimiento" showBack />
       <div className="px-4 py-3 space-y-4">
         {/* Vehículo seleccionado */}
@@ -311,7 +318,7 @@ export function QuickRegisterView({ preset }: { preset?: string }) {
 
             <div className="flex gap-2 pt-2 sticky bottom-4">
               <Button
-                className="flex-1 h-12 text-base"
+                className="flex-1 h-12 text-base glow-primary shine-on-hover"
                 disabled={saving}
                 onClick={save}
               >

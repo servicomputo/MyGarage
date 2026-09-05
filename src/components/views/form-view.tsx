@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PhotoUpload } from "@/components/photo-upload";
+import { Confetti } from "@/components/confetti";
 import {
   PART_CATEGORIES, EXPENSE_CATEGORIES, FUEL_TYPES, REMINDER_TYPES, DOCUMENT_TYPES, colorClasses,
 } from "@/lib/constants";
@@ -39,6 +40,13 @@ export function FormView({ kind }: { kind: Kind }) {
   const { params, setView } = useNav();
   const vehicleId = params.id;
   const { data: vehicle } = useVehicle(vehicleId);
+  const [celebrate, setCelebrate] = useState(false);
+
+  const handleDone = (target: { view: string; id: string }) => {
+    setCelebrate(true);
+    toast.success(getSuccessMessage(kind));
+    setTimeout(() => setView(target.view as any, { id: target.id }), 800);
+  };
 
   if (!vehicleId || !vehicle) {
     return (
@@ -53,13 +61,14 @@ export function FormView({ kind }: { kind: Kind }) {
 
   return (
     <div className="min-h-screen">
+      <Confetti show={celebrate} onDone={() => setCelebrate(false)} />
       <TopBar title={TITLES[kind]} showBack subtitle={`${vehicle.make} ${vehicle.model} · ${formatMileage(vehicle.mileage)}`} />
       <div className="px-4 py-3">
-        {kind === "add-part" && <PartForm vehicleId={vehicleId} mileage={vehicle.mileage} onDone={() => setView("vehicle-detail", { id: vehicleId })} />}
-        {kind === "add-expense" && <ExpenseForm vehicleId={vehicleId} onDone={() => setView("vehicle-detail", { id: vehicleId })} />}
-        {kind === "add-fuel" && <FuelForm vehicleId={vehicleId} mileage={vehicle.mileage} onDone={() => setView("fuel", { id: vehicleId })} />}
-        {kind === "add-reminder" && <ReminderForm vehicleId={vehicleId} mileage={vehicle.mileage} onDone={() => setView("vehicle-detail", { id: vehicleId })} />}
-        {kind === "add-document" && <DocumentForm vehicleId={vehicleId} onDone={() => setView("vehicle-detail", { id: vehicleId })} />}
+        {kind === "add-part" && <PartForm vehicleId={vehicleId} mileage={vehicle.mileage} onDone={() => handleDone({ view: "vehicle-detail", id: vehicleId })} />}
+        {kind === "add-expense" && <ExpenseForm vehicleId={vehicleId} onDone={() => handleDone({ view: "vehicle-detail", id: vehicleId })} />}
+        {kind === "add-fuel" && <FuelForm vehicleId={vehicleId} mileage={vehicle.mileage} onDone={() => handleDone({ view: "fuel", id: vehicleId })} />}
+        {kind === "add-reminder" && <ReminderForm vehicleId={vehicleId} mileage={vehicle.mileage} onDone={() => handleDone({ view: "vehicle-detail", id: vehicleId })} />}
+        {kind === "add-document" && <DocumentForm vehicleId={vehicleId} onDone={() => handleDone({ view: "vehicle-detail", id: vehicleId })} />}
       </div>
     </div>
   );
@@ -429,9 +438,20 @@ function DocumentForm({ vehicleId, onDone }: { vehicleId: string; onDone: () => 
 
 function SubmitButton({ loading }: { loading: boolean }) {
   return (
-    <Button type="submit" className="w-full h-12 text-base" disabled={loading}>
+    <Button type="submit" className="w-full h-12 text-base glow-primary shine-on-hover" disabled={loading}>
       {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Save className="mr-2 h-5 w-5" />}
       Guardar
     </Button>
   );
+}
+
+function getSuccessMessage(kind: Kind): string {
+  const messages: Record<Kind, string> = {
+    "add-part": "✨ Refacción agregada",
+    "add-expense": "✨ Gasto registrado",
+    "add-fuel": "⛽ Carga registrada",
+    "add-reminder": "🔔 Recordatorio creado",
+    "add-document": "📎 Documento guardado",
+  };
+  return messages[kind];
 }
