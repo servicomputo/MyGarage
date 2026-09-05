@@ -28,21 +28,24 @@ export function BottomNav() {
                 className="relative flex flex-col items-center justify-end pb-1 tap-feedback group"
                 aria-label={item.label}
               >
+                {/* Halo pulsante detrás del FAB */}
+                <span className="absolute -top-5 left-1/2 -translate-x-1/2 h-14 w-14 rounded-full bg-primary/20 animate-soft-pulse" />
+
                 {/* Onda de pulso doble detrás del FAB */}
                 <span className="absolute top-0 left-1/2 -translate-x-1/2 h-14 w-14 rounded-full bg-primary/20 animate-ripple" />
                 <span className="absolute top-0 left-1/2 -translate-x-1/2 h-14 w-14 rounded-full bg-primary/15 animate-ripple" style={{ animationDelay: "0.8s" }} />
 
                 {/* FAB principal con gradiente rico y brillo superior */}
-                <span className="absolute -top-5 left-1/2 -translate-x-1/2 grid place-items-center h-14 w-14 rounded-full text-primary-foreground shadow-xl glow-primary ring-4 ring-card transition-transform active:scale-90 group-hover:scale-105 overflow-hidden">
+                <span className="absolute -top-5 left-1/2 -translate-x-1/2 grid place-items-center h-14 w-14 rounded-full text-primary-foreground shadow-xl glow-primary ring-4 ring-card transition-transform active:scale-90 group-hover:scale-110 group-active:rotate-90 overflow-hidden">
                   {/* Gradiente base */}
                   <span className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-primary to-emerald-600" />
                   {/* Brillo superior (efecto 3D) */}
                   <span className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/30 to-transparent" />
-                  {/* Icono */}
-                  <Icon className="relative h-6 w-6 drop-shadow-sm" strokeWidth={2.8} />
+                  {/* Icono con animación de entrada */}
+                  <Icon className="relative h-6 w-6 drop-shadow-sm transition-transform group-active:scale-75" strokeWidth={2.8} />
                 </span>
                 {/* Label centrado debajo */}
-                <span className="relative text-[11px] font-medium text-muted-foreground mt-7">{item.label}</span>
+                <span className="relative text-[11px] font-medium text-muted-foreground mt-7 transition-colors group-hover:text-primary">{item.label}</span>
               </button>
             );
           }
@@ -61,7 +64,7 @@ export function BottomNav() {
                 <span className="absolute top-1 h-1 w-6 rounded-full bg-primary animate-scale-in" />
               )}
               <Icon
-                className={cn("h-5 w-5 transition-transform", active ? "scale-110" : "group-hover:scale-105")}
+                className={cn("h-5 w-5 transition-transform duration-200", active ? "scale-110" : "group-hover:scale-125 group-active:scale-90")}
                 strokeWidth={active ? 2.5 : 2}
               />
               <span className={cn("text-[11px] font-medium transition-colors", active && "text-primary")}>

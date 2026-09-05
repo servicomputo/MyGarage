@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PhotoUpload } from "@/components/photo-upload";
 import { MAINTENANCE_TYPES, colorClasses } from "@/lib/constants";
-import { formatMileage, formatCurrency, todayLocalISO } from "@/lib/format";
+import { formatMileage, formatCurrency, todayLocalISO, getReminderStatus, STATUS_COLOR, type ReminderStatus } from "@/lib/format";
 import { ChevronDown, ChevronRight, Loader2, Check } from "lucide-react";
 import { Confetti } from "@/components/confetti";
 import { toast } from "sonner";
@@ -57,34 +57,79 @@ export function QuickRegisterView({ preset }: { preset?: string }) {
       <div className="min-h-screen">
         <TopBar title="Registrar" showBack />
         <div className="px-4 py-3">
-          <p className="text-sm text-muted-foreground mb-3">Selecciona el vehículo:</p>
-          <div className="space-y-2">
-            {(vehicles ?? []).map((v) => (
-              <Card
-                key={v.id}
-                className="p-3 flex items-center gap-3 cursor-pointer tap-feedback"
-                onClick={() => {
-                  selectVehicle(v.id);
-                  setMileage(v.mileage);
-                }}
-              >
-                <div className="h-12 w-16 rounded-md overflow-hidden bg-muted shrink-0">
+          {/* Header animado */}
+          <div className="text-center mb-4 animate-fade-up">
+            <div className="inline-grid place-items-center h-14 w-14 rounded-2xl bg-primary/10 mb-2">
+              <span className="text-2xl animate-float">🚗</span>
+            </div>
+            <h2 className="text-lg font-bold">¿Qué vehículo?</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">Selecciona el vehículo para registrar el servicio</p>
+          </div>
+
+          {/* Tarjetas de vehículo con foto de fondo */}
+          <div className="space-y-3 stagger">
+            {(vehicles ?? []).map((v) => {
+              const nextReminder = v.nextReminder;
+              const statusInfo = nextReminder
+                ? (nextReminder as any).status && typeof (nextReminder as any).status === "object"
+                  ? (nextReminder as any).status
+                  : getReminderStatus(nextReminder, v.mileage)
+                : null;
+              return (
+                <button
+                  key={v.id}
+                  onClick={() => {
+                    selectVehicle(v.id);
+                    setMileage(v.mileage);
+                  }}
+                  className="relative w-full h-32 rounded-2xl overflow-hidden tap-feedback card-elevated group animate-fade-up block text-left"
+                >
+                  {/* Foto de fondo */}
                   {v.photo ? (
-                     
-                    <img src={v.photo} alt="" className="h-full w-full object-cover" />
+                    <img src={v.photo} alt={`${v.make} ${v.model}`} className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110 group-active:scale-95" />
                   ) : (
-                    <div className="h-full w-full grid place-items-center text-xl">🚗</div>
+                    <div className="absolute inset-0 grid place-items-center text-5xl bg-gradient-to-br from-muted to-muted/50">🚗</div>
                   )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold truncate">{v.make} {v.model}</p>
-                  <p className="text-xs text-muted-foreground">{formatMileage(v.mileage)}</p>
-                </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </Card>
-            ))}
+
+                  {/* Overlay con degradado para legibilidad */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10" />
+
+                  {/* Brillo que cruza al hover */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+
+                  {/* Contenido sobre la foto */}
+                  <div className="absolute inset-0 p-4 flex flex-col justify-between">
+                    <div className="flex items-start justify-between">
+                      <div className="text-white">
+                        <p className="text-xs opacity-80 font-medium">{v.year}</p>
+                      </div>
+                      {statusInfo && (
+                        <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${STATUS_COLOR[statusInfo.status as ReminderStatus]?.bg ?? "bg-gray-500/30"} ${STATUS_COLOR[statusInfo.status as ReminderStatus]?.text ?? "text-white"} backdrop-blur-sm`}>
+                          <span className={`h-1.5 w-1.5 rounded-full ${STATUS_COLOR[statusInfo.status as ReminderStatus]?.dot ?? "bg-gray-400"}`} />
+                          {statusInfo.label}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-white">
+                      <h3 className="text-base font-bold drop-shadow-lg truncate">{v.make} {v.model}</h3>
+                      <div className="flex items-center justify-between mt-0.5">
+                        <p className="text-xs opacity-90">{formatMileage(v.mileage)}</p>
+                        <span className="text-xs font-medium opacity-80 flex items-center gap-0.5">
+                          Tocar para registrar <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
             {(!vehicles || vehicles.length === 0) && (
-              <p className="text-sm text-muted-foreground text-center py-6">No tienes vehículos. Agrega uno primero.</p>
+              <div className="text-center py-12 animate-fade-up">
+                <div className="inline-grid place-items-center h-16 w-16 rounded-2xl bg-muted mb-3">
+                  <span className="text-3xl">🚗</span>
+                </div>
+                <p className="text-sm text-muted-foreground">No tienes vehículos. Agrega uno primero.</p>
+              </div>
             )}
           </div>
         </div>
