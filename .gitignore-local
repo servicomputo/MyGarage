@@ -1,0 +1,6 @@
+*.apk
+*.jks
+android/
+out/
+build-apk.sh
+capacitor.config.ts
