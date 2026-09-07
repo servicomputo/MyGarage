@@ -3,12 +3,14 @@
 import { TopBar } from "@/components/top-bar";
 import { Card } from "@/components/ui/card";
 import { useNav } from "@/lib/store";
+import { getUserName } from "@/lib/user-name";
 import {
-  Bell, History, FileText, Sparkles, ChevronRight, Car, Info, Shield, Fuel,
+  Bell, History, FileText, Sparkles, ChevronRight, Car, Info, Shield, Fuel, Mail,
 } from "lucide-react";
 
 export function MoreView() {
   const setView = useNav((s) => s.setView);
+  const userName = getUserName() || "Usuario";
 
   const menu = [
     { icon: Fuel, label: "Combustible", desc: "Consumo, km/L y gasto por vehículo", onClick: () => setView("fuel") },
@@ -25,12 +27,12 @@ export function MoreView() {
       <div className="px-4 py-3 space-y-4">
         {/* Perfil */}
         <Card className="p-4 flex items-center gap-3">
-          <div className="h-12 w-12 rounded-full bg-primary/15 grid place-items-center text-primary font-bold text-lg">
-            U
+          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-emerald-600 grid place-items-center text-white font-bold text-lg shadow-md">
+            {userName.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold truncate">Usuario Demo</p>
-            <p className="text-xs text-muted-foreground truncate">Sesión local · datos guardados en este dispositivo</p>
+            <p className="font-semibold truncate">{userName}</p>
+            <p className="text-xs text-muted-foreground truncate">Datos guardados en este dispositivo</p>
           </div>
         </Card>
 
@@ -65,7 +67,7 @@ export function MoreView() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium">Acerca de</p>
-              <p className="text-xs text-muted-foreground">My Garage v1.0 · PWA</p>
+              <p className="text-xs text-muted-foreground">My Garage v1.0</p>
             </div>
           </div>
           <div className="flex items-center gap-3 px-4 py-3">
@@ -75,6 +77,18 @@ export function MoreView() {
             <div className="flex-1">
               <p className="text-sm font-medium">Privacidad</p>
               <p className="text-xs text-muted-foreground">Tus datos solo son accesibles por ti</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 px-4 py-3">
+            <div className="grid place-items-center h-9 w-9 rounded-lg bg-muted">
+              <Mail className="h-4 w-4" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium">Operado por</p>
+              <p className="text-xs text-muted-foreground">Jema Digital Solutions</p>
+              <a href="mailto:hola@jema.digital" className="text-xs text-primary hover:underline">
+                hola@jema.digital
+              </a>
             </div>
           </div>
         </Card>

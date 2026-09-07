@@ -19,6 +19,8 @@ import { FuelView } from "@/components/views/fuel-view";
 import { FormView } from "@/components/views/form-view";
 import { useVehicles, useSeedDemo } from "@/lib/queries";
 import { SplashScreen } from "@/components/splash-screen";
+import { WelcomeScreen } from "@/components/welcome-screen";
+import { getUserName } from "@/lib/user-name";
 
 const SPLASH_MIN_DURATION = 2500; // 2.5s para que se aprecien las ondas y el logo
 
@@ -28,8 +30,10 @@ export default function Home() {
   const seed = useSeedDemo();
   const seededRef = useRef(false);
 
-  // Estado del splash: se muestra al inicio siempre (no usar sessionStorage)
+  // Estado del splash: se muestra al inicio siempre
   const [showSplash, setShowSplash] = useState(true);
+  // Estado de bienvenida: si el usuario no tiene nombre guardado
+  const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -38,6 +42,17 @@ export default function Home() {
     }, SPLASH_MIN_DURATION);
     return () => clearTimeout(timer);
   }, []);
+
+  // Verificar si el usuario ya tiene nombre guardado
+  useEffect(() => {
+    if (!showSplash) {
+      const name = getUserName();
+      if (!name) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setShowWelcome(true);
+      }
+    }
+  }, [showSplash]);
 
   // Auto-cargar datos de ejemplo la primera vez si no hay vehículos
   useEffect(() => {
@@ -51,6 +66,11 @@ export default function Home() {
   // Splash inicial: mientras carga O durante el mínimo de tiempo
   if (showSplash || (vehiclesLoading && !vehicles)) {
     return <SplashScreen />;
+  }
+
+  // Pantalla de bienvenida si no tiene nombre
+  if (showWelcome) {
+    return <WelcomeScreen onDone={() => setShowWelcome(false)} />;
   }
 
   const isFormView = ["add-maintenance", "add-part", "add-expense", "add-fuel", "add-reminder", "add-document"].includes(view);

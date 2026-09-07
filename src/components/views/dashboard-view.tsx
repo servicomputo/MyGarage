@@ -4,6 +4,7 @@ import { useDashboard, useSeedDemo, type DashboardData } from "@/lib/queries";
 import { useNav, openVehicle, openQuickRegister } from "@/lib/store";
 import { formatCurrency, formatMileage, formatRelativeTime, getReminderStatus, STATUS_COLOR, type ReminderStatus } from "@/lib/format";
 import { getMaintenanceType, getReminderType, colorClasses } from "@/lib/constants";
+import { getUserName } from "@/lib/user-name";
 import { TopBar } from "@/components/top-bar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,9 +17,9 @@ export function DashboardView() {
   const setView = useNav((s) => s.setView);
   const seed = useSeedDemo();
 
-  // Calcular saludo con la hora LOCAL del navegador (no la del servidor UTC)
+  // Saludo con la hora LOCAL del navegador (no la del servidor UTC)
   const greeting = getLocalGreeting();
-  const name = "Usuario";
+  const name = getUserName() || "Usuario";
 
   if (isLoading) {
     return (
