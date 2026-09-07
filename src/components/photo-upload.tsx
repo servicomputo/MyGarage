@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Camera, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface PhotoUploadProps {
   value?: string | null;
@@ -23,12 +24,16 @@ export function PhotoUpload({ value, onChange, label = "Foto", className, accept
       const fd = new FormData();
       fd.append("file", file);
       const res = await fetch("/api/upload", { method: "POST", body: fd });
-      if (!res.ok) throw new Error("Error al subir");
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || `Error ${res.status}`);
+      }
       onChange(data.url);
+      toast.success("Imagen subida");
     } catch (err) {
-      console.error(err);
-      alert("No se pudo subir la imagen");
+      const msg = err instanceof Error ? err.message : "Error desconocido";
+      console.error("[upload]", msg);
+      toast.error(`No se pudo subir: ${msg}`);
     } finally {
       setUploading(false);
       e.target.value = "";
@@ -53,7 +58,6 @@ export function PhotoUpload({ value, onChange, label = "Foto", className, accept
       >
         {value ? (
           <>
-            { }
             <img src={value} alt={label} className="absolute inset-0 h-full w-full object-cover" />
             <div className="absolute inset-0 bg-black/30 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
               <span className="text-white text-sm font-medium">Cambiar</span>
