@@ -58,7 +58,7 @@ export function PhotoUpload({ value, onChange, label = "Foto", className, accept
       >
         {value ? (
           <>
-            <img src={value} alt={label} className="absolute inset-0 h-full w-full object-cover" />
+            <img key={value} src={value} alt={label} className="absolute inset-0 h-full w-full object-cover" />
             <div className="absolute inset-0 bg-black/30 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
               <span className="text-white text-sm font-medium">Cambiar</span>
             </div>

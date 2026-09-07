@@ -42,8 +42,9 @@ export function AddVehicleView({ editing }: { editing?: boolean }) {
   useEffect(() => {
     if (existing) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setForm({
-        photo: existing.photo ?? null,
+      setForm((prev) => ({
+        ...prev,
+        photo: prev.photo ?? existing.photo ?? null,
         make: existing.make,
         model: existing.model,
         year: existing.year,
@@ -55,7 +56,7 @@ export function AddVehicleView({ editing }: { editing?: boolean }) {
         purchaseDate: existing.purchaseDate ? existing.purchaseDate.split("T")[0] : "",
         purchasePrice: existing.purchasePrice ?? "",
         notes: existing.notes ?? "",
-      });
+      }));
     }
   }, [existing]);
 
