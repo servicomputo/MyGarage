@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Camera, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { isCapacitor } from "@/lib/offline-db";
 
 interface PhotoUploadProps {
   value?: string | null;
@@ -11,6 +12,16 @@ interface PhotoUploadProps {
   label?: string;
   className?: string;
   accept?: string;
+}
+
+// Convierte un archivo a base64 data URL (para uso offline en el APK)
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 export function PhotoUpload({ value, onChange, label = "Foto", className, accept = "image/*" }: PhotoUploadProps) {
@@ -21,15 +32,23 @@ export function PhotoUpload({ value, onChange, label = "Foto", className, accept
     if (!file) return;
     setUploading(true);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(data.error || `Error ${res.status}`);
+      if (isCapacitor()) {
+        // En el APK (sin servidor): convertir a base64 y guardar localmente
+        const base64 = await fileToBase64(file);
+        onChange(base64);
+        toast.success("Imagen guardada");
+      } else {
+        // En el navegador (con servidor): subir al API
+        const fd = new FormData();
+        fd.append("file", file);
+        const res = await fetch("/api/upload", { method: "POST", body: fd });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data.error || `Error ${res.status}`);
+        }
+        onChange(data.url);
+        toast.success("Imagen subida");
       }
-      onChange(data.url);
-      toast.success("Imagen subida");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Error desconocido";
       console.error("[upload]", msg);
