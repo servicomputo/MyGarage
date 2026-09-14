@@ -6,7 +6,7 @@ import { TopBar } from "@/components/top-bar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EmptyState, StatPill } from "@/components/ui-bits";
-import { formatCurrency, formatDate, formatMileage, formatRelativeTime } from "@/lib/format";
+import { formatCurrency, formatDate, formatMileage, formatRelativeTime, round2 } from "@/lib/format";
 import { FUEL_TYPES } from "@/lib/constants";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -131,21 +131,21 @@ function VehicleFuelView({ vehicleId }: { vehicleId: string }) {
           <MetricCard
             icon={<Gauge className="h-4 w-4" />}
             label="Consumo promedio"
-            value={fuel.avgConsumption !== null ? `${fuel.avgConsumption}` : "—"}
+            value={fuel.avgConsumption !== null ? `${round2(fuel.avgConsumption)}` : "—"}
             unit="km/L"
             tone="emerald"
           />
           <MetricCard
             icon={<DollarSign className="h-4 w-4" />}
             label="Costo por km"
-            value={fuel.costPerKm !== null ? `$${fuel.costPerKm}` : "—"}
+            value={fuel.costPerKm !== null ? `$${round2(fuel.costPerKm)}` : "—"}
             unit="MXN/km"
             tone="amber"
           />
           <MetricCard
             icon={<Droplet className="h-4 w-4" />}
             label="Litros totales"
-            value={fuel.totalLiters.toFixed(1)}
+            value={fuel.totalLiters >= 1000 ? formatNumber(Math.round(fuel.totalLiters)) : round2(fuel.totalLiters).toFixed(1)}
             unit="L"
             tone="sky"
           />
@@ -164,7 +164,7 @@ function VehicleFuelView({ vehicleId }: { vehicleId: string }) {
               <div>
                 <p className="text-xs uppercase tracking-wide text-muted-foreground">Rendimiento actual</p>
                 <p className="text-3xl font-bold text-primary mt-1">
-                  {fuel.avgConsumption} <span className="text-base font-normal text-muted-foreground">km/L</span>
+                  {round2(fuel.avgConsumption)} <span className="text-base font-normal text-muted-foreground">km/L</span>
                 </p>
                 {fuel.avgConsumption >= 15 && <p className="text-xs text-emerald-600 mt-1">Excelente rendimiento</p>}
                 {fuel.avgConsumption >= 10 && fuel.avgConsumption < 15 && <p className="text-xs text-emerald-600 mt-1">Buen rendimiento</p>}
@@ -237,7 +237,7 @@ function VehicleFuelView({ vehicleId }: { vehicleId: string }) {
 
         {/* Datos adicionales */}
         <Card className="p-4 space-y-2 text-sm">
-          <Row label="Precio promedio por litro" value={`$${fuel.avgPricePerL}`} />
+          <Row label="Precio promedio por litro" value={`$${round2(fuel.avgPricePerL)}`} />
           <Row label="Distancia recorrida (registrada)" value={formatMileage(fuel.totalDistance)} />
           <Row label="Número de cargas" value={String(fuel.fuelingCount)} />
           {fuel.lastFueling && (

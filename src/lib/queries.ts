@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { isCapacitor, offlineDB } from "@/lib/offline-db";
+import { round2 } from "@/lib/format";
 
 // === Fetch helper (solo para navegador con servidor) ===
 async function fetchJson(url: string, init?: RequestInit) {
@@ -213,7 +214,7 @@ function getOfflineVehicleStats(vehicleId: string): VehicleStats {
     const sorted = [...fuelings].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     const distance = sorted[sorted.length - 1].mileage - sorted[0].mileage;
     const litersBetween = sorted.slice(1).reduce((s, f) => s + f.liters, 0);
-    if (distance > 0 && litersBetween > 0) avgConsumption = Math.round((distance / litersBetween) * 100) / 100;
+    if (distance > 0 && litersBetween > 0) avgConsumption = round2(distance / litersBetween);
   }
 
   const recentActivity: HistoryItem[] = [];
@@ -223,10 +224,10 @@ function getOfflineVehicleStats(vehicleId: string): VehicleStats {
   recentActivity.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return {
-    totalSpend,
-    thisMonth: expenses.filter((e) => new Date(e.date) >= monthStart).reduce((s, e) => s + e.amount, 0),
-    thisYear: expenses.filter((e) => new Date(e.date) >= yearStart).reduce((s, e) => s + e.amount, 0),
-    byCategory: Object.entries(byCategory).map(([category, amount]) => ({ category, amount })),
+    totalSpend: round2(totalSpend),
+    thisMonth: round2(expenses.filter((e) => new Date(e.date) >= monthStart).reduce((s, e) => s + e.amount, 0)),
+    thisYear: round2(expenses.filter((e) => new Date(e.date) >= yearStart).reduce((s, e) => s + e.amount, 0)),
+    byCategory: Object.entries(byCategory).map(([category, amount]) => ({ category, amount: round2(amount) })),
     maintenanceCount: maintenance.length,
     lastMaintenance: maintenance[0] ?? null,
     nextReminders: reminders.filter((r) => r.enabled).slice(0, 5),
@@ -235,7 +236,7 @@ function getOfflineVehicleStats(vehicleId: string): VehicleStats {
     fuelingCount: fuelings.length,
     overdueCount: 0,
     hasReminders: reminders.length > 0,
-    fuelStats: { totalLiters, totalFuelSpend, avgConsumption, costPerKm: totalSpend > 0 && vehicle.mileage > 0 ? totalSpend / vehicle.mileage : null },
+    fuelStats: { totalLiters: round2(totalLiters), totalFuelSpend: round2(totalFuelSpend), avgConsumption, costPerKm: totalSpend > 0 && vehicle.mileage > 0 ? round2(totalSpend / vehicle.mileage) : null },
     recentActivity: recentActivity.slice(0, 5),
   };
 }
@@ -298,14 +299,14 @@ export function useVehicleFuelStats(id: string | null | undefined) {
         if (fuelings.length >= 2) {
           const distance = fuelings[fuelings.length - 1].mileage - fuelings[0].mileage;
           const litersBetween = fuelings.slice(1).reduce((s, f) => s + f.liters, 0);
-          if (distance > 0 && litersBetween > 0) avgConsumption = Math.round((distance / litersBetween) * 100) / 100;
+          if (distance > 0 && litersBetween > 0) avgConsumption = round2(distance / litersBetween);
         }
         const totalDistance = fuelings.length >= 2 ? fuelings[fuelings.length - 1].mileage - fuelings[0].mileage : 0;
         return {
-          totalLiters, totalFuelSpend,
+          totalLiters: round2(totalLiters), totalFuelSpend: round2(totalFuelSpend),
           litersThisMonth: 0, spendThisMonth: 0, litersThisYear: 0, spendThisYear: 0,
-          avgConsumption, avgPricePerL: totalLiters > 0 ? totalFuelSpend / totalLiters : 0,
-          costPerKm: vehicle && totalFuelSpend > 0 && vehicle.mileage > 0 ? totalFuelSpend / vehicle.mileage : null,
+          avgConsumption, avgPricePerL: round2(totalLiters > 0 ? totalFuelSpend / totalLiters : 0),
+          costPerKm: vehicle && totalFuelSpend > 0 && vehicle.mileage > 0 ? round2(totalFuelSpend / vehicle.mileage) : null,
           totalDistance, fuelingCount: fuelings.length,
           lastFueling: fuelings[fuelings.length - 1] ?? null,
           monthlyTrend: [], consumptionPoints: [], fuelings: fuelings.reverse(),

@@ -2,7 +2,7 @@
 
 import { useDashboard, useSeedDemo, type DashboardData } from "@/lib/queries";
 import { useNav, openVehicle, openQuickRegister } from "@/lib/store";
-import { formatCurrency, formatMileage, formatRelativeTime, getReminderStatus, STATUS_COLOR, type ReminderStatus } from "@/lib/format";
+import { formatCurrency, formatMileage, formatRelativeTime, getReminderStatus, STATUS_COLOR, round2, type ReminderStatus } from "@/lib/format";
 import { getMaintenanceType, getReminderType, colorClasses } from "@/lib/constants";
 import { getUserName } from "@/lib/user-name";
 import { TopBar } from "@/components/top-bar";
@@ -193,13 +193,13 @@ export function DashboardView() {
                     <p className="text-sm font-medium truncate">{v.make} {v.model}</p>
                     <p className="text-xs text-muted-foreground">
                       {fs && fs.fuelingCount > 0
-                        ? `${fs.fuelingCount} cargas · ${fs.totalLiters} L · ${formatCurrency(fs.totalFuelSpend)}`
+                        ? `${fs.fuelingCount} cargas · ${round2(fs.totalLiters)} L · ${formatCurrency(fs.totalFuelSpend)}`
                         : "Sin cargas registradas"}
                     </p>
                   </div>
                   {fs && fs.avgConsumption !== null && (
                     <div className="text-right shrink-0">
-                      <p className="text-sm font-bold text-primary">{fs.avgConsumption}</p>
+                      <p className="text-sm font-bold text-primary">{round2(fs.avgConsumption)}</p>
                       <p className="text-[10px] text-muted-foreground">km/L</p>
                     </div>
                   )}

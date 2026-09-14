@@ -36,6 +36,12 @@ export function formatNumber(value: number | null | undefined): string {
   return new Intl.NumberFormat("es-MX").format(value ?? 0);
 }
 
+// Redondea un número a 2 decimales (para cálculos de combustible, costos, etc.)
+export function round2(value: number | null | undefined): number {
+  if (value === null || value === undefined || isNaN(value)) return 0;
+  return Math.round(value * 100) / 100;
+}
+
 export function formatMileage(km: number | null | undefined): string {
   return `${formatNumber(km)} km`;
 }

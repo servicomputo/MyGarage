@@ -5,7 +5,7 @@ import { useNav, openVehicle } from "@/lib/store";
 import { TopBar } from "@/components/top-bar";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui-bits";
-import { formatCurrency, formatMileage } from "@/lib/format";
+import { formatCurrency, formatMileage, round2 } from "@/lib/format";
 import { getMaintenanceType } from "@/lib/constants";
 import { Sparkles, TrendingUp, Wrench, Gauge, Loader2, Lightbulb } from "lucide-react";
 
@@ -109,7 +109,7 @@ function VehicleInsights({ vehicleId, vehicleName }: { vehicleId: string; vehicl
       icon: <TrendingUp className="h-4 w-4" />,
       tone: "violet",
       title: `${vehicleName} · Combustible`,
-      text: `Tu consumo promedio es de ${stats.fuelStats.avgConsumption.toFixed(1)} km/L${stats.fuelStats.costPerKm ? `, con un costo de $${stats.fuelStats.costPerKm.toFixed(2)} por km.` : "."}`,
+      text: `Tu consumo promedio es de ${round2(stats.fuelStats.avgConsumption).toFixed(1)} km/L${stats.fuelStats.costPerKm ? `, con un costo de $${round2(stats.fuelStats.costPerKm).toFixed(2)} por km.` : "."}`,
     });
   }
 
