@@ -141,6 +141,17 @@ function uid(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
+// Devuelve la fecha actual como ISO string respetando la zona horaria local.
+// Usa mediodía local para evitar que la conversión a UTC cambie el día.
+function localDateISO(date?: Date): string {
+  const d = date || new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  // Mediodía local en ISO para preservar el día correcto
+  return `${y}-${m}-${day}T12:00:00.000`;
+}
+
 // === API Offline ===
 export const offlineDB = {
   // Vehicles
@@ -149,7 +160,7 @@ export const offlineDB = {
   },
   createVehicle(data: Partial<Vehicle>): Vehicle {
     const vehicles = read<Vehicle>("vehicles");
-    const now = new Date().toISOString();
+    const now = localDateISO();
     const v: Vehicle = {
       id: uid(),
       photo: data.photo ?? null,
@@ -175,7 +186,7 @@ export const offlineDB = {
     const vehicles = read<Vehicle>("vehicles");
     const idx = vehicles.findIndex((v) => v.id === id);
     if (idx === -1) return null;
-    vehicles[idx] = { ...vehicles[idx], ...data, updatedAt: new Date().toISOString() };
+    vehicles[idx] = { ...vehicles[idx], ...data, updatedAt: localDateISO() };
     write("vehicles", vehicles);
     return vehicles[idx];
   },
@@ -203,7 +214,7 @@ export const offlineDB = {
       vehicleId: data.vehicleId || "",
       type: data.type || "OTHER",
       customType: data.customType ?? null,
-      date: data.date || new Date().toISOString(),
+      date: data.date || localDateISO(),
       mileage: data.mileage ?? 0,
       description: data.description ?? null,
       partsCost: data.partsCost ?? 0,
@@ -255,7 +266,7 @@ export const offlineDB = {
       category: data.category || "OTHER",
       brand: data.brand ?? null,
       partNumber: data.partNumber ?? null,
-      installDate: data.installDate || new Date().toISOString(),
+      installDate: data.installDate || localDateISO(),
       installMileage: data.installMileage ?? 0,
       cost: data.cost ?? 0,
       provider: data.provider ?? null,
@@ -293,7 +304,7 @@ export const offlineDB = {
       category: data.category || "OTHER",
       title: data.title || "",
       amount: data.amount ?? 0,
-      date: data.date || new Date().toISOString(),
+      date: data.date || localDateISO(),
       notes: data.notes ?? null,
     };
     items.push(e);
@@ -316,7 +327,7 @@ export const offlineDB = {
     const f: Fueling = {
       id: uid(),
       vehicleId: data.vehicleId || "",
-      date: data.date || new Date().toISOString(),
+      date: data.date || localDateISO(),
       mileage: data.mileage ?? 0,
       liters: data.liters ?? 0,
       pricePerL: data.pricePerL ?? 0,
@@ -398,7 +409,7 @@ export const offlineDB = {
       fileUrl: data.fileUrl || "",
       fileType: data.fileType || "image",
       notes: data.notes ?? null,
-      date: data.date || new Date().toISOString(),
+      date: data.date || localDateISO(),
     };
     items.push(d);
     write("documents", items);
@@ -412,8 +423,8 @@ export const offlineDB = {
   seedDemo(): void {
     if (read<Vehicle>("vehicles").length > 0) return;
     const now = new Date();
-    const monthsAgo = (m: number) => new Date(now.getFullYear(), now.getMonth() - m, 4).toISOString();
-    const daysAhead = (d: number) => new Date(now.getTime() + d * 86400000).toISOString();
+    const monthsAgo = (m: number) => localDateISO(new Date(now.getFullYear(), now.getMonth() - m, 4));
+    const daysAhead = (d: number) => localDateISO(new Date(now.getTime() + d * 86400000));
 
     // Vehículos
     const v1 = this.createVehicle({
