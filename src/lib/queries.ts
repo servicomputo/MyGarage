@@ -302,11 +302,22 @@ export function useVehicleFuelStats(id: string | null | undefined) {
           if (distance > 0 && litersBetween > 0) avgConsumption = round2(distance / litersBetween);
         }
         const totalDistance = fuelings.length >= 2 ? fuelings[fuelings.length - 1].mileage - fuelings[0].mileage : 0;
+
+        // Calcular litros y gasto por periodo
+        const now = new Date();
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        const yearStart = new Date(now.getFullYear(), 0, 1);
+        const litersThisMonth = fuelings.filter((f) => new Date(f.date) >= monthStart).reduce((s, f) => s + f.liters, 0);
+        const spendThisMonth = fuelings.filter((f) => new Date(f.date) >= monthStart).reduce((s, f) => s + f.total, 0);
+        const litersThisYear = fuelings.filter((f) => new Date(f.date) >= yearStart).reduce((s, f) => s + f.liters, 0);
+        const spendThisYear = fuelings.filter((f) => new Date(f.date) >= yearStart).reduce((s, f) => s + f.total, 0);
+
         return {
           totalLiters: round2(totalLiters), totalFuelSpend: round2(totalFuelSpend),
-          litersThisMonth: 0, spendThisMonth: 0, litersThisYear: 0, spendThisYear: 0,
+          litersThisMonth: round2(litersThisMonth), spendThisMonth: round2(spendThisMonth),
+          litersThisYear: round2(litersThisYear), spendThisYear: round2(spendThisYear),
           avgConsumption, avgPricePerL: round2(totalLiters > 0 ? totalFuelSpend / totalLiters : 0),
-          costPerKm: vehicle && totalFuelSpend > 0 && vehicle.mileage > 0 ? round2(totalFuelSpend / vehicle.mileage) : null,
+          costPerKm: totalDistance > 0 && totalFuelSpend > 0 ? round2(totalFuelSpend / totalDistance) : null,
           totalDistance, fuelingCount: fuelings.length,
           lastFueling: fuelings[fuelings.length - 1] ?? null,
           monthlyTrend: [], consumptionPoints: [], fuelings: fuelings.reverse(),
